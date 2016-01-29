@@ -5,3 +5,4 @@ authors = ["nokaa <nokaa@cock.li>"]
 
 [dependencies]
 clap = "1.5.5"
+mio = "0.5.0"

@@ -1,6 +1,8 @@
 extern crate clap;
+extern crate mio;
 
 use clap::App;
+use mio::*;
 use std::fs::File;
 use std::io;
 use std::io::{Read, Write};
@@ -31,7 +33,7 @@ fn main() {
         if let Err(e) = io::stdin().read_to_end(&mut input) {
             panic!("Error: {}", e);
         }
-        if let Err(e) = io::stdout().write_all(input.as_slice()) {
+        if let Err(e) = io::stdout().write_all(&input[..]) {
             panic!("Error: {}", e);
         }
     }
@@ -50,6 +52,6 @@ fn read_file(filename: String) -> Vec<u8> {
 /// Helper function for writing to a file. Writes `contents` to `filename`.
 fn write_file(filename: String, contents: Vec<u8>) -> Result<(), std::io::Error> {
     let mut file = try!(File::create(Path::new(&filename)));
-    try!(file.write_all(contents.as_slice()));
+    try!(file.write_all(&contents[..]));
     Ok(())
 }
