@@ -6,3 +6,7 @@ authors = ["nokaa <nokaa@cock.li>"]
 [dependencies]
 clap = "2"
 rotor = "0.5.0"
+
+nix = "0.4.2"
+argparse = "0.2.1"
+void = "0.0.5"
