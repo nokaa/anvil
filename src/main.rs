@@ -2,12 +2,11 @@ extern crate clap;
 extern crate rotor;
 
 use clap::App;
-use rotor::{EventSet, PollOpt, Loop, Config};
+use rotor::{EventSet, PollOpt, Loop, Config, Void};
 use rotor::mio::{TryRead, TryWrite};
 use rotor::mio::tcp::{TcpListener, TcpStream};
 use rotor::{Machine, Response, EarlyScope, Scope};
 
-use std::error::Error;
 use std::fs::File;
 use std::io;
 use std::io::{Read, Write};
@@ -53,7 +52,7 @@ fn main() {
 fn run(address: SocketAddr) {
     let mut loop_creator = Loop::new(&Config::new()).unwrap();
     let lst = TcpListener::bind(&address).unwrap();
-    loop_creator.add_machine_with(|scope| Ok(Echo::new(lst, scope)))
+    loop_creator.add_machine_with(|scope| Echo::new(lst, scope))
                 .unwrap();
     loop_creator.run(Context).unwrap();
 }
@@ -106,10 +105,10 @@ enum Echo {
 }
 
 impl Echo {
-    pub fn new(sock: TcpListener, scope: &mut EarlyScope) -> Echo {
+    pub fn new(sock: TcpListener, scope: &mut EarlyScope) -> Response<Echo, Void> {
         scope.register(&sock, EventSet::readable(), PollOpt::edge())
              .unwrap();
-        Echo::Server(sock)
+        Response::ok(Echo::Server(sock))
     }
 
     fn accept(self) -> Response<Echo, TcpStream> {
@@ -133,10 +132,10 @@ impl Machine for Echo {
     type Context = Context;
     type Seed = TcpStream;
 
-    fn create(conn: TcpStream, scope: &mut Scope<Context>) -> Result<Self, Box<Error>> {
+    fn create(conn: TcpStream, scope: &mut Scope<Context>) -> Response<Self, Void> {
         scope.register(&conn, EventSet::readable(), PollOpt::level())
              .unwrap();
-        Ok(Echo::Connection(conn))
+        Response::ok(Echo::Connection(conn))
     }
 
     fn ready(self, _events: EventSet, _scope: &mut Scope<Context>) -> Response<Self, TcpStream> {
