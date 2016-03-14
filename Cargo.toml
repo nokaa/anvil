@@ -7,6 +7,6 @@ authors = ["nokaa <nokaa@cock.li>"]
 clap = "2.1.2"
 rotor = "0.6.2"
 
-nix = "0.4.2"
 argparse = "0.2.1"
-void = "0.0.5"
+nix = "0.4.2"
+void = "1.0.0"

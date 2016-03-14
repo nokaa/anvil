@@ -8,7 +8,6 @@ extern crate rotor;
 extern crate argparse;
 extern crate void;
 
-use std::error::Error;
 use std::io::{Write, stderr, stdout};
 use std::os::unix::io::FromRawFd;
 
@@ -46,19 +45,21 @@ rotor_compose!(enum Composed/CSeed <Context> {
 // ^^ note that enum names are different, you need to fix them below
 
 impl Tcp {
-    fn new(sock: TcpStream, scope: &mut EarlyScope) -> Tcp {
+    fn new(sock: TcpStream, scope: &mut EarlyScope) -> Response<Tcp, Void> {
         scope.register(&sock, EventSet::writable(), PollOpt::level())
              .unwrap();
-        Tcp::Connecting(sock)
+        Response::ok(Tcp::Connecting(sock))
     }
 }
 
 impl Machine for Tcp {
     type Context = Context;
     type Seed = Void;
-    fn create(seed: Void, _scope: &mut Scope<Context>) -> Result<Self, Box<Error>> {
+
+    fn create(seed: Void, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable(seed);
     }
+
     fn ready(self, _events: EventSet, scope: &mut Scope<Context>) -> Response<Self, Void> {
         match self {
             Tcp::Connecting(sock) => {
@@ -94,35 +95,41 @@ impl Machine for Tcp {
             }
         }
     }
+
     fn spawned(self, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable!();
     }
+
     fn timeout(self, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable!();
     }
+
     fn wakeup(self, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable!();
     }
 }
 
 impl Stdin {
-    fn new(dest: TcpStream, scope: &mut EarlyScope) -> Stdin {
+    fn new(dest: TcpStream, scope: &mut EarlyScope) -> Response<Stdin, Void> {
         let stdin = unsafe { UnixStream::from_raw_fd(0) };
         scope.register(&stdin, EventSet::readable(), PollOpt::level())
              .unwrap();
-        Stdin {
+
+        Response::ok(Stdin {
             input: stdin,
             output: dest,
-        }
+        })
     }
 }
 
 impl Machine for Stdin {
     type Context = Context;
     type Seed = Void;
-    fn create(seed: Void, _scope: &mut Scope<Context>) -> Result<Self, Box<Error>> {
+
+    fn create(seed: Void, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable(seed);
     }
+
     fn ready(mut self, _events: EventSet, scope: &mut Scope<Context>) -> Response<Self, Void> {
         let mut data = [0u8; 1024];
         match self.input.try_read(&mut data) {
@@ -152,14 +159,18 @@ impl Machine for Stdin {
             }
             Ok(None) => {}
         }
+
         Response::ok(self)
     }
+
     fn spawned(self, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable!();
     }
+
     fn timeout(self, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable!();
     }
+
     fn wakeup(self, _scope: &mut Scope<Context>) -> Response<Self, Void> {
         unreachable!();
     }
@@ -168,6 +179,7 @@ impl Machine for Stdin {
 fn main() {
     let mut host = "127.0.0.1".to_string();
     let mut port = 3000u16;
+
     {
         let mut ap = ArgumentParser::new();
         ap.set_description("
@@ -205,9 +217,9 @@ fn main() {
     // This isn't a good idea for the real work
     fcntl(0, FcntlArg::F_SETFL(O_NONBLOCK)).expect("fcntl");
 
-    loop_creator.add_machine_with(|scope| Ok(Composed::Tcp(Tcp::new(conn, scope))))
+    loop_creator.add_machine_with(|scope| Tcp::new(conn, scope).wrap(Composed::Tcp))
                 .unwrap();
-    loop_creator.add_machine_with(|scope| Ok(Composed::Stdin(Stdin::new(conn2, scope))))
+    loop_creator.add_machine_with(|scope| Stdin::new(conn2, scope).wrap(Composed::Stdin))
                 .unwrap();
     loop_creator.run(Context).unwrap();
 }
