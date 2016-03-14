@@ -1,17 +1,16 @@
 extern crate clap;
 extern crate rotor;
 
+mod file;
+
 use clap::App;
 use rotor::{EventSet, PollOpt, Loop, Config, Void};
 use rotor::mio::{TryRead, TryWrite};
 use rotor::mio::tcp::{TcpListener, TcpStream};
 use rotor::{Machine, Response, EarlyScope, Scope};
 
-use std::fs::File;
-use std::io;
-use std::io::{Read, Write};
+use std::io::{self, Write};
 use std::net::SocketAddr;
-use std::path::Path;
 
 fn main() {
     // Clap handles command line args for us.
@@ -55,46 +54,6 @@ fn run(address: SocketAddr) {
     loop_creator.add_machine_with(|scope| Echo::new(lst, scope))
                 .unwrap();
     loop_creator.run(Context).unwrap();
-}
-
-#[allow(dead_code)]
-/// Helper function for reading from a file. Reads from `filename` and returns a `Vec<u8>`.
-fn read_file(filename: String) -> Vec<u8> {
-    let mut reader = File::open(Path::new(&filename)).ok().expect("Unable to open file");
-    let mut buf: Vec<u8> = vec![];
-    reader.read_to_end(&mut buf).unwrap();
-
-    buf
-}
-
-#[allow(dead_code)]
-/// Helper function for writing to a file. Writes `contents` to `filename`.
-fn write_file(filename: String, contents: Vec<u8>) -> Result<(), std::io::Error> {
-    let mut file = try!(File::create(Path::new(&filename)));
-    try!(file.write_all(&contents[..]));
-    Ok(())
-}
-
-#[allow(dead_code)]
-/// Helper function for writing to a file. Writes `contents` to `filename`.
-fn write_file_slice(filename: String, contents: &[u8]) -> Result<(), std::io::Error> {
-    let mut file = try!(File::create(Path::new(&filename)));
-    try!(file.write_all(contents));
-    Ok(())
-}
-
-/// Takes a `&[u8]` and returns a `Vec<u8>` containing all values until the first 0.
-fn get_nonzero_bytes(data: &[u8]) -> Vec<u8> {
-    let mut buf: Vec<u8> = vec![];
-    for ch in data {
-        if *ch == 0u8 {
-            break;
-        } else {
-            buf.push(*ch);
-        }
-    }
-
-    buf
 }
 
 struct Context;
@@ -147,8 +106,8 @@ impl Machine for Echo {
                     Ok(Some(0)) => Response::done(),
                     Ok(Some(x)) => {
                         // Take the received data and write to file.
-                        let input = get_nonzero_bytes(&data[..]);
-                        let _ = write_file("test".to_string(), input);
+                        let input = file::get_nonzero_bytes(&data[..]);
+                        let _ = file::write_file("test".to_string(), input);
                         // Write received data to console for testing purposes
                         let _ = io::stdout().write_all(&data[..]);
                         match sock.try_write(&data[..x]) {
