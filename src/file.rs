@@ -3,7 +3,7 @@ use std::io::{self, Read, Write};
 
 #[allow(dead_code)]
 /// Helper function for reading from a file. Reads from `filename` and returns a `Vec<u8>`.
-pub fn read_file(filename: String) -> Vec<u8> {
+pub fn read_file(filename: &str) -> Vec<u8> {
     let mut reader = File::open(filename).ok().expect("Unable to open file");
     let mut buf: Vec<u8> = vec![];
     reader.read_to_end(&mut buf).unwrap();
@@ -11,6 +11,7 @@ pub fn read_file(filename: String) -> Vec<u8> {
     buf
 }
 
+#[allow(dead_code)]
 /// Helper function for writing to a file. Writes `contents` to `filename`.
 pub fn write_file(filename: String, contents: Vec<u8>) -> Result<(), io::Error> {
     let mut file = try!(File::create(filename));

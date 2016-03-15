@@ -1,7 +1,3 @@
-// nix = "0.4.2"
-// rotor = "0.5.0"
-// argparse = "0.2.1"
-// void = "0.0.5"
 extern crate nix;
 #[macro_use]
 extern crate rotor;

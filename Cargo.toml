@@ -6,7 +6,9 @@ authors = ["nokaa <nokaa@cock.li>"]
 [dependencies]
 clap = "2.1.2"
 rotor = "0.6.2"
+rustbox = { git = "https:/github.com/gchp/rustbox.git" }
 
+[dev-dependencies]
 argparse = "0.2.1"
 nix = "0.4.2"
 void = "1.0.0"
