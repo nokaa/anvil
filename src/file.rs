@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{self, Read, Write};
 
+#[allow(dead_code)]
 /// Helper function for reading from a file. Reads from `filename` and returns a `Vec<u8>`.
 pub fn read_file(filename: String) -> Vec<u8> {
     let mut reader = File::open(filename).ok().expect("Unable to open file");
@@ -17,6 +18,7 @@ pub fn write_file(filename: String, contents: Vec<u8>) -> Result<(), io::Error> 
     Ok(())
 }
 
+#[allow(dead_code)]
 /// Helper function for writing to a file. Writes `contents` to `filename`.
 pub fn write_file_slice(filename: String, contents: &[u8]) -> Result<(), io::Error> {
     let mut file = try!(File::create(filename));
@@ -24,6 +26,7 @@ pub fn write_file_slice(filename: String, contents: &[u8]) -> Result<(), io::Err
     Ok(())
 }
 
+#[allow(dead_code)]
 /// Takes a `&[u8]` and returns a `Vec<u8>` containing all values until the first 0.
 pub fn get_nonzero_bytes(data: &[u8]) -> Vec<u8> {
     let mut buf: Vec<u8> = vec![];
