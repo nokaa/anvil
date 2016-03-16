@@ -3,27 +3,27 @@ use std::io::{self, Read, Write};
 
 #[allow(dead_code)]
 /// Helper function for reading from a file. Reads from `filename` and returns a `Vec<u8>`.
-pub fn read_file(filename: &str) -> Vec<u8> {
-    let mut reader = File::open(filename).ok().expect("Unable to open file");
+pub fn read_file(filename: &str) -> Result<Vec<u8>, io::Error> {
+    let mut f = try!(File::open(filename));
     let mut buf: Vec<u8> = vec![];
-    reader.read_to_end(&mut buf).unwrap();
+    try!(f.read_to_end(&mut buf));
 
-    buf
+    Ok(buf)
+}
+
+/// Returns `true` if `filename` exists, `false` otherwise.
+pub fn file_exists(filename: &str) -> bool {
+    match File::open(filename) {
+        Ok(_) => true,
+        Err(_) => false,
+    }
 }
 
 #[allow(dead_code)]
 /// Helper function for writing to a file. Writes `contents` to `filename`.
-pub fn write_file(filename: String, contents: Vec<u8>) -> Result<(), io::Error> {
+pub fn write_file(filename: &str, data: &[u8]) -> Result<(), io::Error> {
     let mut file = try!(File::create(filename));
-    try!(file.write_all(&contents[..]));
-    Ok(())
-}
-
-#[allow(dead_code)]
-/// Helper function for writing to a file. Writes `contents` to `filename`.
-pub fn write_file_slice(filename: String, contents: &[u8]) -> Result<(), io::Error> {
-    let mut file = try!(File::create(filename));
-    try!(file.write_all(contents));
+    try!(file.write_all(data));
     Ok(())
 }
 
