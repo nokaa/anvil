@@ -45,17 +45,20 @@ pub fn run(editor: &mut editor::Editor) {
                     }
                     'h' => {
                         if cursor.pos.x != 0 {
+                            cursor.lpos = cursor.pos;
                             cursor.pos.x -= 1;
                         }
                     }
                     'j' => {
                         // TODO(nokaa): We don't want to go beyond
                         // the working area here.
+                        cursor.lpos = cursor.pos;
                         cursor.pos.y += 1;
 
                     }
                     'k' => {
                         if cursor.pos.y != 0 {
+                            cursor.lpos = cursor.pos;
                             cursor.pos.y -= 1;
                         }
                     }
@@ -63,6 +66,7 @@ pub fn run(editor: &mut editor::Editor) {
                         // TODO(nokaa): We don't want to extend beyond the
                         // line length here, but we first need a way to
                         // determine a given line's length.
+                        cursor.lpos = cursor.pos;
                         cursor.pos.x += 1;
                     }
                     'q' => {
