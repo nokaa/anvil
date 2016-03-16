@@ -4,9 +4,9 @@ version = "0.1.0"
 dependencies = [
  "argparse 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "fe-rustty 0.1.9 (git+https://github.com/Syntaf/fe-rustty.git)",
  "nix 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rotor 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "rustbox 0.8.1 (git+https://github.com/gchp/rustbox.git)",
  "void 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -17,11 +17,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "argparse"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "bitflags"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
@@ -57,6 +52,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "fe-rustty"
+version = "0.1.9"
+source = "git+https://github.com/Syntaf/fe-rustty.git#68a2eb42651d88009ca6bf53e6de616425eee938"
+dependencies = [
+ "gag 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lazy_static 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nix 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "term 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "gag"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -73,6 +80,11 @@ dependencies = [
  "winapi 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi-build 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "lazy_static"
+version = "0.1.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "libc"
@@ -141,15 +153,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num"
-version = "0.1.31"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "rand 0.3.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "rustc-serialize 0.3.18 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "quick-error"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -173,23 +176,6 @@ dependencies = [
  "time 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
  "void 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
-
-[[package]]
-name = "rustbox"
-version = "0.8.1"
-source = "git+https://github.com/gchp/rustbox.git#698dd6e7a7376ecc831fe40fc5ef2a148b4a567d"
-dependencies = [
- "bitflags 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "gag 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
- "num 0.1.31 (registry+https://github.com/rust-lang/crates.io-index)",
- "termbox-sys 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "rustc-serialize"
-version = "0.3.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "rustc_version"
@@ -227,9 +213,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "termbox-sys"
-version = "0.2.9"
+name = "term"
+version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "kernel32-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winapi 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "time"

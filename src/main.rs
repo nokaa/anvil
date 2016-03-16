@@ -1,13 +1,11 @@
 extern crate clap;
-extern crate rustbox;
+extern crate rustty;
 
 mod file;
+mod editor;
 
 use clap::App;
-use rustbox::{Color, Key, RustBox};
-
-use std::default::Default;
-//use std::io::{self, Read, Write};
+use rustty::{Terminal, Event, Color};
 
 fn main() {
     // Clap handles command line args for us.
@@ -21,54 +19,96 @@ fn main() {
     // For now we are just reading from stdin, so we check to see if the user passed a file to
     // output to. Otherwise we output to stdout
     if let Some(file) = matches.value_of("OUTPUT") {
-        let f = file::read_file(file);
-        let text = String::from_utf8(f).unwrap();
-        run(&text[..]);
-        /*let mut input = Vec::new();
-        if let Err(e) = io::stdin().read_to_end(&mut input) {
-            panic!("Error: {}", e);
-        }
-
-        if let Err(e) = file::write_file(file.to_string(), input) {
-            panic!("Error: {}", e);
-        }*/
+        let mut editor = editor::Editor::new(file.to_string());
+        //let f = file::read_file(file);
+        //let text = String::from_utf8(f).unwrap();
+        run(&mut editor);
     } else {
-        let text = "Forge";
-        run(text);
-        /*let mut input = Vec::new();
-        if let Err(e) = io::stdin().read_to_end(&mut input) {
-            panic!("Error: {}", e);
-        }
-        if let Err(e) = io::stdout().write_all(&input[..]) {
-            panic!("Error: {}", e);
-        }*/
+        let mut editor = editor::Editor::new("".to_string());
+        //let text = "Forge";
+        run(&mut editor);
     }
 }
 
-fn run(text: &str) {
-    let rustbox = match RustBox::init(Default::default()) {
-        Ok(v) => v,
-        Err(e) => panic!("{}", e),
+struct Cursor {
+    pos: Position,
+    lpos: Position,
+    color: Color,
+}
+
+#[derive(Copy, Clone)]
+struct Position {
+    x: usize,
+    y: usize,
+}
+
+fn run(editor: &mut editor::Editor) {
+    let mut cursor = Cursor {
+        pos: Position {x: 0, y: 0},
+        lpos: Position {x: 0, y: 0},
+        color: Color::Red,
     };
 
-    let mut lines = text.lines();
-    let mut y = 1;
-    while let Some(line) = lines.next() {
-        rustbox.print(1, y, rustbox::RB_NORMAL, Color::White, Color::Black, line);
-        y += 1;
-    }
+    let mut term = Terminal::new().unwrap();
+    term[(cursor.pos.x, cursor.pos.y)].set_bg(cursor.color);
+    term.swap_buffers().unwrap();
 
     loop {
-        rustbox.present();
-        match rustbox.poll_event(false) {
-            Ok(rustbox::Event::KeyEvent(key)) => {
-                match key {
-                    Key::Char('q') => { break; }
+        let evt = term.get_event(100).unwrap();
+        if let Some(Event::Key(ch)) = evt {
+            if editor.command_mode() {
+                match ch {
+                    'i' => {
+                        editor.switch_mode();
+                    }
+                    'q' => {
+                        break;
+                    }
                     _ => { }
                 }
-            },
-            Err(e) => panic!("{}", e),
-            _ => { }
+            } else {
+                match ch {
+                    '\x1b' => {
+                        editor.switch_mode();
+                    }
+                    '\x7f' => {
+                        cursor.lpos = cursor.pos;
+                        if cursor.pos.x == 0 {
+                            cursor.pos.y = cursor.pos.y.saturating_sub(1);
+                        } else {
+                            cursor.pos.x -= 1;
+                        }
+                        term[(cursor.pos.x, cursor.pos.y)].set_ch(' ');
+                    }
+                    '\r' => {
+                        cursor.lpos = cursor.pos;
+                        cursor.pos.x = 0;
+                        cursor.pos.y += 1;
+                    }
+                    c @ _ => {
+                        term[(cursor.pos.x, cursor.pos.y)].set_ch(c);
+                        cursor.lpos = cursor.pos;
+                        cursor.pos.x += 1;
+                    }
+                }
+            }
+
+            if cursor.pos.x >= term.cols() - 1 {
+                term[(cursor.lpos.x, cursor.lpos.y)].set_bg(Color::Default);
+                cursor.lpos = cursor.pos;
+                cursor.pos.x = 0;
+                cursor.pos.y += 1;
+            }
+            if cursor.pos.y >= term.rows() - 1 {
+                term[(cursor.lpos.x, cursor.lpos.y)].set_bg(Color::Default);
+                cursor.lpos = cursor.pos;
+                cursor.pos.x = 0;
+                cursor.pos.y = 0;
+            }
+
+            term[(cursor.lpos.x, cursor.lpos.y)].set_bg(Color::Default);
+            term[(cursor.pos.x, cursor.pos.y)].set_bg(cursor.color);
+            term.swap_buffers().unwrap();
         }
     }
 }
