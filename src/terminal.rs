@@ -1,18 +1,21 @@
 use rustty::{Terminal, Event, Color};
 use editor;
 
+/// Represents an `x, y` coordinate.
 #[derive(Copy, Clone)]
 struct Position {
     x: usize,
     y: usize,
 }
 
+/// Represents the cursor in our terminal
 struct Cursor {
     pos: Position,
     lpos: Position,
     color: Color,
 }
 
+/// Launches the terminal using the given `editor`.
 pub fn run(editor: &mut editor::Editor) {
     let mut cursor = Cursor {
         pos: Position {x: 0, y: 0},
@@ -61,10 +64,10 @@ pub fn run(editor: &mut editor::Editor) {
                 }
             } else {
                 match ch {
-                    '\x1b' => {
+                    '\x1b' => { // Escape key
                         editor.switch_mode();
                     }
-                    '\x7f' => {
+                    '\x7f' => { // Backspace key
                         cursor.lpos = cursor.pos;
                         if cursor.pos.x == 0 {
                             cursor.pos.y = cursor.pos.y.saturating_sub(1);
