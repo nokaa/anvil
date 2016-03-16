@@ -32,7 +32,13 @@ impl Editor {
         if filename == "".to_string() {
             contents = vec![b'F', b'o', b'r', b'g', b'e'];
         } else {
-            contents = file::read_file(&filename[..]);
+            if file::file_exists(&filename[..]) {
+                // It *should* be safe to unwrap here, since we have already checked
+                // that `filename` exists.
+                contents = file::read_file(&filename[..]).unwrap();
+            } else {
+                contents = vec![];
+            }
         }
 
         Editor {
