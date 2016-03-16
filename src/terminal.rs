@@ -32,6 +32,28 @@ pub fn run(editor: &mut editor::Editor) {
                     'i' => {
                         editor.switch_mode();
                     }
+                    'h' => {
+                        if cursor.pos.x != 0 {
+                            cursor.pos.x -= 1;
+                        }
+                    }
+                    'j' => {
+                        // TODO(nokaa): We don't want to go beyond
+                        // the working area here.
+                        cursor.pos.y += 1;
+
+                    }
+                    'k' => {
+                        if cursor.pos.y != 0 {
+                            cursor.pos.y -= 1;
+                        }
+                    }
+                    'l' => {
+                        // TODO(nokaa): We don't want to extend beyond the
+                        // line length here, but we first need a way to
+                        // determine a given line's length.
+                        cursor.pos.x += 1;
+                    }
                     'q' => {
                         break;
                     }
@@ -55,6 +77,14 @@ pub fn run(editor: &mut editor::Editor) {
                         cursor.lpos = cursor.pos;
                         cursor.pos.x = 0;
                         cursor.pos.y += 1;
+                    }
+                    '\t' => {
+                        term[(cursor.pos.x, cursor.pos.y)].set_ch(' ');
+                        term[(cursor.pos.x + 1, cursor.pos.y)].set_ch(' ');
+                        term[(cursor.pos.x + 2, cursor.pos.y)].set_ch(' ');
+                        term[(cursor.pos.x + 3, cursor.pos.y)].set_ch(' ');
+                        cursor.lpos = cursor.pos;
+                        cursor.pos.x += 4;
                     }
                     c @ _ => {
                         term[(cursor.pos.x, cursor.pos.y)].set_ch(c);
