@@ -32,6 +32,7 @@ pub fn run(editor: &mut editor::Editor) {
 
     let mut term = Terminal::new().unwrap();
     term[(cursor.pos.x, cursor.pos.y)].set_bg(cursor.color);
+    prompt(&mut term, editor.filename());
     term.swap_buffers().unwrap();
 
     loop {
@@ -121,5 +122,18 @@ pub fn run(editor: &mut editor::Editor) {
             term[(cursor.pos.x, cursor.pos.y)].set_bg(cursor.color);
             term.swap_buffers().unwrap();
         }
+    }
+}
+
+fn prompt(term: &mut Terminal, filename: String) {
+    let w = term.cols();
+    let h = term.rows();
+
+    for i in 0..w {
+        term[(i, h - 2)].set_bg(Color::Red);
+    }
+
+    for (i, c) in filename.chars().enumerate() {
+        term[(i, h - 2)].set_ch(c);
     }
 }
