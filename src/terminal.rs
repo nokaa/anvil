@@ -94,10 +94,9 @@ pub fn run(editor: &mut editor::Editor) {
                         cursor.pos.y += 1;
                     }
                     '\t' => {
-                        term[(cursor.pos.x, cursor.pos.y)].set_ch(' ');
-                        term[(cursor.pos.x + 1, cursor.pos.y)].set_ch(' ');
-                        term[(cursor.pos.x + 2, cursor.pos.y)].set_ch(' ');
-                        term[(cursor.pos.x + 3, cursor.pos.y)].set_ch(' ');
+                        for i in 0..4 {
+                            term[(cursor.pos.x + i, cursor.pos.y)].set_ch(' ');
+                        }
                         cursor.lpos = cursor.pos;
                         cursor.pos.x += 4;
                     }
