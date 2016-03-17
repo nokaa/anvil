@@ -19,7 +19,7 @@ pub fn read_file(filename: &str) -> Result<Vec<u8>, io::Error> {
 }
 
 pub fn read_file_lines(filename: &str) -> Result<Vec<Vec<u8>>, io::Error> {
-    let mut f = try!(File::open(filename));
+    let f = try!(File::open(filename));
     let mut lines: Vec<Vec<u8>> = vec![];
     let mut line: Vec<u8> = vec![];
 

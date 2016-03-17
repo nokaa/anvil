@@ -16,7 +16,7 @@ pub struct Editor<'a> {
     /// we are working with
     filename: &'a str,
     /// Represents the contents of the file
-    contents: Vec<Vec<u8>>,
+    pub contents: Vec<Vec<u8>>,
 }
 
 /// This enum represents what mode the editor is in.

@@ -32,6 +32,7 @@ pub fn run(editor: &mut editor::Editor) {
 
     let mut term = Terminal::new().unwrap();
     term[(cursor.pos.x, cursor.pos.y)].set_bg(cursor.color);
+    print_file(&mut term, &editor.contents);
     prompt(&mut term, editor.filename());
     term.swap_buffers().unwrap();
 
@@ -138,5 +139,21 @@ fn prompt(term: &mut Terminal, filename: &str) {
 
     for (i, c) in filename.chars().enumerate() {
         term[(i, h - 2)].set_ch(c);
+    }
+}
+
+fn print_file(term: &mut Terminal, contents: &Vec<Vec<u8>>) {
+    let mut i = 0;
+    let mut j = 0;
+    for line in contents {
+        for b in line {
+            term[(j, i)].set_ch(*b as char);
+            j += 1;
+        }
+        i += 1;
+        j = 0;
+        if i == term.rows() - 2 {
+            break;
+        }
     }
 }
