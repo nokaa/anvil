@@ -8,13 +8,13 @@
 use file;
 
 /// A struct representing an editor
-pub struct Editor {
+pub struct Editor<'a> {
     /// Represents the mode the editor
     /// is currently in
     mode: EditorMode,
     /// Represents the name of the file
     /// we are working with
-    filename: String,
+    filename: &'a str,
     /// Represents the contents of the file
     contents: Vec<u8>,
 }
@@ -30,19 +30,19 @@ pub enum EditorMode {
     Insert,
 }
 
-impl Editor {
+impl<'a> Editor<'a> {
     /// Creates a new editor. If filename is the empty
     /// string, the contents are `Forge`. Otherwise, the
     /// given filename is read as the contents.
-    pub fn new(filename: String) -> Editor {
+    pub fn new(filename: &str) -> Editor {
         let contents: Vec<u8>;
-        if filename == "".to_string() {
+        if filename == "" {
             contents = vec![b'F', b'o', b'r', b'g', b'e'];
         } else {
-            if file::file_exists(&filename[..]) {
+            if file::file_exists(filename) {
                 // It *should* be safe to unwrap here, since we have already checked
                 // that `filename` exists.
-                contents = file::read_file(&filename[..]).unwrap();
+                contents = file::read_file(filename).unwrap();
             } else {
                 contents = vec![];
             }
@@ -56,8 +56,8 @@ impl Editor {
     }
 
     /// Returns the name of the file we are working with.
-    pub fn filename(&self) -> String {
-        self.filename.clone()
+    pub fn filename(&self) -> &str {
+        self.filename
     }
 
     /// Returns true if we are in `Command` mode,

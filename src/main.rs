@@ -26,10 +26,10 @@ fn main() {
     // For now we are just reading from stdin, so we check to see if the user passed a file to
     // output to. Otherwise we output to stdout
     if let Some(file) = matches.value_of("OUTPUT") {
-        let mut editor = editor::Editor::new(file.to_string());
+        let mut editor = editor::Editor::new(file);
         terminal::run(&mut editor);
     } else {
-        let mut editor = editor::Editor::new("".to_string());
+        let mut editor = editor::Editor::new("");
         terminal::run(&mut editor);
     }
 }

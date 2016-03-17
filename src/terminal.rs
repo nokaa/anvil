@@ -128,7 +128,7 @@ pub fn run(editor: &mut editor::Editor) {
     }
 }
 
-fn prompt(term: &mut Terminal, filename: String) {
+fn prompt(term: &mut Terminal, filename: &str) {
     let w = term.cols();
     let h = term.rows();
 
