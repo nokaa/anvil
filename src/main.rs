@@ -17,7 +17,7 @@ use clap::App;
 fn main() {
     // Clap handles command line args for us.
     let matches = App::new("forge")
-                       .version("0.1")
+                       .version("v0.1")
                        .author("nokaa <nokaa@cock.li>")
                        .about("A text editor")
                        .arg_from_usage("[OUTPUT] 'Sets the output file to use'")
