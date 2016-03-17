@@ -16,7 +16,7 @@ pub struct Editor<'a> {
     /// we are working with
     filename: &'a str,
     /// Represents the contents of the file
-    contents: Vec<u8>,
+    contents: Vec<Vec<u8>>,
 }
 
 /// This enum represents what mode the editor is in.
@@ -35,16 +35,16 @@ impl<'a> Editor<'a> {
     /// string, the contents are `Forge`. Otherwise, the
     /// given filename is read as the contents.
     pub fn new(filename: &str) -> Editor {
-        let contents: Vec<u8>;
+        let contents: Vec<Vec<u8>>;
         if filename == "" {
-            contents = vec![b'F', b'o', b'r', b'g', b'e'];
+            contents = vec![vec![b'F', b'o', b'r', b'g', b'e']];
         } else {
             if file::file_exists(filename) {
                 // It *should* be safe to unwrap here, since we have already checked
                 // that `filename` exists.
-                contents = file::read_file(filename).unwrap();
+                contents = file::read_file_lines(filename).unwrap();
             } else {
-                contents = vec![];
+                contents = vec![vec![]];
             }
         }
 

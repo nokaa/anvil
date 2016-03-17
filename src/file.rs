@@ -18,6 +18,30 @@ pub fn read_file(filename: &str) -> Result<Vec<u8>, io::Error> {
     Ok(buf)
 }
 
+pub fn read_file_lines(filename: &str) -> Result<Vec<Vec<u8>>, io::Error> {
+    let mut f = try!(File::open(filename));
+    let mut lines: Vec<Vec<u8>> = vec![];
+    let mut line: Vec<u8> = vec![];
+
+    for byte in f.bytes() {
+        match byte {
+            Err(e) => return Err(e),
+            Ok(b) => match b {
+                b'\n' => {
+                    lines.push(line);
+                    line = vec![];
+                }
+                // We do nothing on the carriage return for now.
+                // TODO(nokaa): We should decide what to do here.
+                b'\r' => { }
+                _ => line.push(b),
+            }
+        }
+    }
+
+    Ok(lines)
+}
+
 /// Returns `true` if `filename` exists, `false` otherwise.
 pub fn file_exists(filename: &str) -> bool {
     match File::open(filename) {
