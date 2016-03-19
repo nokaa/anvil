@@ -2,6 +2,11 @@
 name = "forge"
 version = "0.1.0"
 authors = ["nokaa <nokaa@cock.li>"]
+description = "A text editor"
+repository = "https://github.com/nokaa/forge.git"
+readme = "README.md"
+license = "AGPL"
+keywords = ["text", "editor", "text-editor", "forge"]
 
 [dependencies]
 clap = "2.1.2"
