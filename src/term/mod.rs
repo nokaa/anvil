@@ -41,30 +41,16 @@ impl<'a> Term<'a> {
                             self.editor.switch_mode();
                         }
                         'h' => {
-                            if self.cursor.pos.x != 0 {
-                                self.cursor.lpos = self.cursor.pos;
-                                self.cursor.pos.x -= 1;
-                            }
+                            self.cursor.move_cursor(cursor::Direction::Left);
                         }
                         'j' => {
-                            // TODO(nokaa): We don't want to go beyond
-                            // the working area here.
-                            self.cursor.lpos = self.cursor.pos;
-                            self.cursor.pos.y += 1;
-
+                            self.cursor.move_cursor(cursor::Direction::Down);
                         }
                         'k' => {
-                            if self.cursor.pos.y != 0 {
-                                self.cursor.lpos = self.cursor.pos;
-                                self.cursor.pos.y -= 1;
-                            }
+                            self.cursor.move_cursor(cursor::Direction::Up);
                         }
                         'l' => {
-                            // TODO(nokaa): We don't want to extend beyond the
-                            // line length here, but we first need a way to
-                            // determine a given line's length.
-                            self.cursor.lpos = self.cursor.pos;
-                            self.cursor.pos.x += 1;
+                            self.cursor.move_cursor(cursor::Direction::Right);
                         }
                         'q' => {
                             break;

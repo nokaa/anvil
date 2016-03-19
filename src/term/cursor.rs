@@ -7,6 +7,14 @@
 
 use rustty;
 
+/// Represents a direction for movement in the UI
+pub enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
 /// Represents an `x, y` coordinate.
 #[derive(Copy, Clone)]
 pub struct Position {
@@ -36,5 +44,35 @@ impl Cursor {
 
     pub fn last_pos(&self) -> (usize, usize) {
         (self.lpos.x, self.lpos.y)
+    }
+
+    pub fn move_cursor(&mut self, direction: Direction) {
+        match direction {
+            Direction::Up => { // k
+                if self.pos.y != 0 {
+                    self.lpos = self.pos;
+                    self.pos.y -= 1;
+                }
+            }
+            Direction::Down => { // j
+                // TODO(nokaa): We don't want to go beyond
+                // the working area here.
+                self.lpos = self.pos;
+                self.pos.y += 1;
+            }
+            Direction::Left => { // h
+                if self.pos.x != 0 {
+                    self.lpos = self.pos;
+                    self.pos.x -= 1;
+                }
+            }
+            Direction::Right => { // l
+                // TODO(nokaa): We don't want to extend beyond the
+                // line length here, but we first need a way to
+                // determine a given line's length.
+                self.lpos = self.pos;
+                self.pos.x += 1;
+            }
+        }
     }
 }
