@@ -26,16 +26,21 @@ pub struct Term<'a> {
     quit: bool,
     /// Represents the topmost line in our UI
     line: usize,
+    /// Represents the total number of lines in the currently
+    /// open file
+    total_lines: usize,
 }
 
 impl<'a> Term<'a> {
     pub fn new(editor: &'a mut editor::Editor<'a>) -> Term<'a> {
+        let total_lines = editor.contents.len();
         Term {
             cursor: cursor::Cursor::new(Color::Red),
             editor: editor,
             term: rustty::Terminal::new().unwrap(),
             quit: false,
             line: 0,
+            total_lines: total_lines,
         }
     }
 
@@ -112,13 +117,30 @@ impl<'a> Term<'a> {
                 if self.cursor.pos.y != 0 {
                     self.cursor.save_pos();
                     self.cursor.pos.y -= 1;
+                } else if self.current_line() != 0 {
+                    let current_line = self.current_line();
+                    self.set_current_line(current_line - 1);
+                    self.redraw_file();
                 }
             }
             cursor::Direction::Down => {
-                // TODO(nokaa): We don't want to go beyond
-                // the working area here.
-                self.cursor.save_pos();
-                self.cursor.pos.y += 1;
+                if self.total_lines() <= self.term.rows() - 3 {
+                    if self.cursor.pos.y != self.term.rows() - 3 &&
+                       self.cursor.pos.y < self.total_lines() - 1
+                    {
+                        self.cursor.save_pos();
+                        self.cursor.pos.y += 1;
+                    }
+                } else {
+                    if self.cursor.pos.y != self.term.rows() - 3 {
+                        self.cursor.save_pos();
+                        self.cursor.pos.y += 1;
+                    } else if self.cursor.pos.y + self.current_line() < self.total_lines() {
+                        let current_line = self.current_line();
+                        self.set_current_line(current_line + 1);
+                        self.redraw_file();
+                    }
+                }
             }
             cursor::Direction::Left => {
                 if self.cursor.pos.x != 0 {
@@ -141,7 +163,32 @@ impl<'a> Term<'a> {
         self.quit = true;
     }
 
+    /// Returns the total lines in our file
+    pub fn total_lines(&self) -> usize {
+        self.total_lines
+    }
+
+    /// Allows us to modify the total number of lines
+    /// in our file, e.g. if a new line is added.
+    pub fn set_total_lines(&mut self, change: isize) {
+        let new = self.total_lines as isize + change;
+        self.total_lines = new as usize;
+    }
+
+    /// Gives the current line at the top of our UI
     pub fn current_line(&self) -> usize {
         self.line
+    }
+
+    /// Allows us to change what the topmost line in the UI is
+    pub fn set_current_line(&mut self, line: usize) {
+        self.line = line;
+    }
+    
+    /// This function redraws the portion of our UI displaying
+    /// file contents. E.g. this is called when the current line
+    /// changes.
+    pub fn redraw_file(&mut self) {
+        println!("redraw!");
     }
 }
