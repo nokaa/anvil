@@ -5,6 +5,7 @@
  * The license may also be found at https://gnu.org/licenses/agpl.txt
  */
 
+mod command;
 mod cursor;
 
 use rustty::{Terminal, Event, Color};
@@ -14,6 +15,7 @@ pub struct Term<'a> {
     cursor: cursor::Cursor,
     editor: &'a mut editor::Editor<'a>,
     term: Terminal,
+    pub quit: bool,
 }
 
 impl<'a> Term<'a> {
@@ -22,6 +24,7 @@ impl<'a> Term<'a> {
             cursor: cursor::Cursor::new(Color::Red),
             editor: editor,
             term: Terminal::new().unwrap(),
+            quit: false,
         }
     }
 
@@ -32,11 +35,12 @@ impl<'a> Term<'a> {
         self.prompt();
         self.term.swap_buffers().unwrap();
 
-        loop {
+        while !self.quit {
             let evt = self.term.get_event(100).unwrap();
             if let Some(Event::Key(ch)) = evt {
                 if self.editor.command_mode() {
-                    match ch {
+                    command::handle(self, ch);
+                    /*match ch {
                         'i' => {
                             self.editor.switch_mode();
                         }
@@ -56,7 +60,7 @@ impl<'a> Term<'a> {
                             break;
                         }
                         _ => { }
-                    }
+                    }*/
                 } else {
                     match ch {
                         '\x1b' => { // Escape key
