@@ -46,6 +46,10 @@ impl Cursor {
         (self.lpos.x, self.lpos.y)
     }
 
+    pub fn save_pos(&mut self) {
+        self.lpos = self.pos;
+    }
+
     pub fn move_cursor(&mut self, direction: Direction) {
         match direction {
             Direction::Up => { // k

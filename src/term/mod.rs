@@ -63,7 +63,7 @@ impl<'a> Term<'a> {
                             self.editor.switch_mode();
                         }
                         '\x7f' => { // Backspace key
-                            self.cursor.lpos = self.cursor.pos;
+                            self.cursor.save_pos();
                             if self.cursor.pos.x == 0 {
                                 self.cursor.pos.y = self.cursor.pos.y.saturating_sub(1);
                             } else {
@@ -72,7 +72,7 @@ impl<'a> Term<'a> {
                             self.term[self.cursor.current_pos()].set_ch(' ');
                         }
                         '\r' => {
-                            self.cursor.lpos = self.cursor.pos;
+                            self.cursor.save_pos();
                             self.cursor.pos.x = 0;
                             self.cursor.pos.y += 1;
                         }
@@ -80,12 +80,12 @@ impl<'a> Term<'a> {
                             for i in 0..4 {
                                 self.term[(self.cursor.pos.x + i, self.cursor.pos.y)].set_ch(' ');
                             }
-                            self.cursor.lpos = self.cursor.pos;
+                            self.cursor.save_pos();
                             self.cursor.pos.x += 4;
                         }
                         c @ _ => {
                             self.term[self.cursor.current_pos()].set_ch(c);
-                            self.cursor.lpos = self.cursor.pos;
+                            self.cursor.save_pos();
                             self.cursor.pos.x += 1;
                         }
                     }
@@ -93,13 +93,13 @@ impl<'a> Term<'a> {
 
                 if self.cursor.pos.x >= self.term.cols() - 1 {
                     self.term[self.cursor.last_pos()].set_bg(Color::Default);
-                    self.cursor.lpos = self.cursor.pos;
+                    self.cursor.save_pos();
                     self.cursor.pos.x = 0;
                     self.cursor.pos.y += 1;
                 }
                 if self.cursor.pos.y >= self.term.rows() - 1 {
                     self.term[self.cursor.last_pos()].set_bg(Color::Default);
-                    self.cursor.lpos = self.cursor.pos;
+                    self.cursor.save_pos();
                     self.cursor.pos.x = 0;
                     self.cursor.pos.y = 0;
                 }
