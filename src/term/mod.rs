@@ -47,7 +47,8 @@ impl<'a> Term<'a> {
     /// Launches the terminal.
     pub fn run(&mut self) {
         self.term[self.cursor.current_pos()].set_bg(self.cursor.color);
-        self.print_file();
+        let current_line = self.current_line();
+        self.print_file(current_line);
         self.prompt();
         self.term.swap_buffers().unwrap();
 
@@ -95,17 +96,28 @@ impl<'a> Term<'a> {
     }
 
     /// Prints our editor's contents to the UI.
-    fn print_file(&mut self) {
+    fn print_file(&mut self, start: usize) {
+        let w = self.term.cols();
         let mut i = 0;
         let mut j = 0;
         for line in &self.editor.contents {
+            if i < start {
+                i += 1;
+                continue;
+            }
+
             for b in line {
-                self.term[(j, i)].set_ch(*b as char);
+                self.term[(j, i - start)].set_ch(*b as char);
                 j += 1;
             }
+            while j < w {
+                self.term[(j, i - start)].set_ch(' ');
+                j += 1;
+            }
+
             i += 1;
             j = 0;
-            if i == self.term.rows() - 2 {
+            if i - start == self.term.rows() - 2 {
                 break;
             }
         }
@@ -135,7 +147,7 @@ impl<'a> Term<'a> {
                     if self.cursor.pos.y != self.term.rows() - 3 {
                         self.cursor.save_pos();
                         self.cursor.pos.y += 1;
-                    } else if self.cursor.pos.y + self.current_line() < self.total_lines() {
+                    } else if self.cursor.pos.y + self.current_line() < self.total_lines() - 1 {
                         let current_line = self.current_line();
                         self.set_current_line(current_line + 1);
                         self.redraw_file();
@@ -149,9 +161,6 @@ impl<'a> Term<'a> {
                 }
             }
             cursor::Direction::Right => {
-                // TODO(nokaa): We don't want to extend beyond the
-                // line length here, but we first need a way to
-                // determine a given line's length.
                 let curr = self.cursor.pos.y + self.current_line();
                 if self.cursor.pos.x != self.editor.contents[curr].len() - 1 {
                     self.cursor.save_pos();
@@ -192,6 +201,7 @@ impl<'a> Term<'a> {
     /// file contents. E.g. this is called when the current line
     /// changes.
     pub fn redraw_file(&mut self) {
-        println!("redraw!");
+        let current_line = self.current_line();
+        self.print_file(current_line);
     }
 }
