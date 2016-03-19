@@ -7,6 +7,7 @@
 
 mod command;
 mod cursor;
+mod insert;
 
 use rustty::{Terminal, Event, Color};
 use editor;
@@ -40,59 +41,8 @@ impl<'a> Term<'a> {
             if let Some(Event::Key(ch)) = evt {
                 if self.editor.command_mode() {
                     command::handle(self, ch);
-                    /*match ch {
-                        'i' => {
-                            self.editor.switch_mode();
-                        }
-                        'h' => {
-                            self.cursor.move_cursor(cursor::Direction::Left);
-                        }
-                        'j' => {
-                            self.cursor.move_cursor(cursor::Direction::Down);
-                        }
-                        'k' => {
-                            self.cursor.move_cursor(cursor::Direction::Up);
-                        }
-                        'l' => {
-                            self.cursor.move_cursor(cursor::Direction::Right);
-                        }
-                        'q' => {
-                            break;
-                        }
-                        _ => { }
-                    }*/
                 } else {
-                    match ch {
-                        '\x1b' => { // Escape key
-                            self.editor.switch_mode();
-                        }
-                        '\x7f' => { // Backspace key
-                            self.cursor.save_pos();
-                            if self.cursor.pos.x == 0 {
-                                self.cursor.pos.y = self.cursor.pos.y.saturating_sub(1);
-                            } else {
-                                self.cursor.pos.x -= 1;
-                            }
-                            self.term[self.cursor.current_pos()].set_ch(' ');
-                        }
-                        '\r' => {
-                            self.cursor.save_pos();
-                            self.cursor.pos.x = 0;
-                            self.cursor.pos.y += 1;
-                        }
-                        '\t' => {
-                            for i in 0..4 {
-                                self.term[(self.cursor.pos.x + i, self.cursor.pos.y)].set_ch(' ');
-                            }
-                            self.cursor.save_pos();
-                            self.cursor.pos.x += 4;
-                        }
-                        c @ _ => {
-                            self.term[self.cursor.current_pos()].set_ch(c);
-                            self.cursor.save_pos();
-                            self.cursor.pos.x += 1;
-                        }
-                    }
+                    insert::handle(self, ch);
                 }
 
                 if self.cursor.pos.x >= self.term.cols() - 1 {
