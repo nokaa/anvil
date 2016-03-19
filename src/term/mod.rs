@@ -9,14 +9,23 @@ mod command;
 mod cursor;
 mod insert;
 
-use rustty::{Terminal, Event, Color};
+use rustty::{self, Event, Color};
 use editor;
 
+/// `Term` represents our client application. This allows
+/// us to work with the filesystem and the UI.
 pub struct Term<'a> {
+    /// Represents the location of the cursor in our UI
     cursor: cursor::Cursor,
+    /// Contains file information; allows us to work with
+    /// the filesystem
     editor: &'a mut editor::Editor<'a>,
-    term: Terminal,
+    /// This is the UI itself
+    term: rustty::Terminal,
+    /// Represents the running status
     quit: bool,
+    /// Represents the topmost line in our UI
+    line: usize,
 }
 
 impl<'a> Term<'a> {
@@ -24,12 +33,13 @@ impl<'a> Term<'a> {
         Term {
             cursor: cursor::Cursor::new(Color::Red),
             editor: editor,
-            term: Terminal::new().unwrap(),
+            term: rustty::Terminal::new().unwrap(),
             quit: false,
+            line: 0,
         }
     }
 
-/// Launches the terminal
+    /// Launches the terminal.
     pub fn run(&mut self) {
         self.term[self.cursor.current_pos()].set_bg(self.cursor.color);
         self.print_file();
@@ -65,7 +75,7 @@ impl<'a> Term<'a> {
         }
     }
 
-    /// Prints our prompt to the UI
+    /// Prints our prompt to the UI.
     pub fn prompt(&mut self) {
         let w = self.term.cols();
         let h = self.term.rows();
@@ -79,7 +89,7 @@ impl<'a> Term<'a> {
         }
     }
 
-    /// Prints our editor's contents to the UI
+    /// Prints our editor's contents to the UI.
     fn print_file(&mut self) {
         let mut i = 0;
         let mut j = 0;
@@ -96,7 +106,12 @@ impl<'a> Term<'a> {
         }
     }
 
+    /// Changes the value of the `quit` attribute to `true`.
     pub fn quit(&mut self) {
         self.quit = true;
+    }
+
+    pub fn current_line(&self) -> usize {
+        self.line
     }
 }
