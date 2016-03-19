@@ -16,7 +16,7 @@ pub struct Term<'a> {
     cursor: cursor::Cursor,
     editor: &'a mut editor::Editor<'a>,
     term: Terminal,
-    pub quit: bool,
+    quit: bool,
 }
 
 impl<'a> Term<'a> {
@@ -94,5 +94,9 @@ impl<'a> Term<'a> {
                 break;
             }
         }
+    }
+
+    pub fn quit(&mut self) {
+        self.quit = true;
     }
 }

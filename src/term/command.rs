@@ -25,7 +25,7 @@ pub fn handle(term: &mut Term, ch: char) {
             term.cursor.move_cursor(cursor::Direction::Right);
         }
         'q' => {
-            term.quit = true;
+            term.quit();
         }
         _ => { }
     }
