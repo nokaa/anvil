@@ -152,8 +152,11 @@ impl<'a> Term<'a> {
                 // TODO(nokaa): We don't want to extend beyond the
                 // line length here, but we first need a way to
                 // determine a given line's length.
-                self.cursor.save_pos();
-                self.cursor.pos.x += 1;
+                let curr = self.cursor.pos.y + self.current_line();
+                if self.cursor.pos.x != self.editor.contents[curr].len() - 1 {
+                    self.cursor.save_pos();
+                    self.cursor.pos.x += 1;
+                }
             }
         }
     }
