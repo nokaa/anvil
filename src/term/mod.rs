@@ -5,25 +5,13 @@
  * The license may also be found at https://gnu.org/licenses/agpl.txt
  */
 
+mod cursor;
+
 use rustty::{Terminal, Event, Color};
 use editor;
 
-/// Represents an `x, y` coordinate.
-#[derive(Copy, Clone)]
-struct Position {
-    x: usize,
-    y: usize,
-}
-
-/// Represents the cursor in our terminal
-struct Cursor {
-    pos: Position,
-    lpos: Position,
-    color: Color,
-}
-
 pub struct Term<'a> {
-    cursor: Cursor,
+    cursor: cursor::Cursor,
     editor: &'a mut editor::Editor<'a>,
     term: Terminal,
 }
@@ -31,11 +19,7 @@ pub struct Term<'a> {
 impl<'a> Term<'a> {
     pub fn new(editor: &'a mut editor::Editor<'a>) -> Term<'a> {
         Term {
-            cursor: Cursor {
-                pos: Position {x: 0, y: 0},
-                lpos: Position {x: 0, y: 0},
-                color: Color::Red,
-            },
+            cursor: cursor::Cursor::new(Color::Red),
             editor: editor,
             term: Terminal::new().unwrap(),
         }
