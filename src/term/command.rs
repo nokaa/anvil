@@ -13,16 +13,16 @@ pub fn handle(term: &mut Term, ch: char) {
             term.editor.switch_mode();
         }
         'h' => {
-            term.cursor.move_cursor(cursor::Direction::Left);
+            term.move_cursor(cursor::Direction::Left);
         }
         'j' => {
-            term.cursor.move_cursor(cursor::Direction::Down);
+            term.move_cursor(cursor::Direction::Down);
         }
         'k' => {
-            term.cursor.move_cursor(cursor::Direction::Up);
+            term.move_cursor(cursor::Direction::Up);
         }
         'l' => {
-            term.cursor.move_cursor(cursor::Direction::Right);
+            term.move_cursor(cursor::Direction::Right);
         }
         'q' => {
             term.quit();

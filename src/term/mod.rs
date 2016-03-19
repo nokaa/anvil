@@ -106,6 +106,36 @@ impl<'a> Term<'a> {
         }
     }
 
+    pub fn move_cursor(&mut self, direction: cursor::Direction) {
+        match direction {
+            cursor::Direction::Up => {
+                if self.cursor.pos.y != 0 {
+                    self.cursor.save_pos();
+                    self.cursor.pos.y -= 1;
+                }
+            }
+            cursor::Direction::Down => {
+                // TODO(nokaa): We don't want to go beyond
+                // the working area here.
+                self.cursor.save_pos();
+                self.cursor.pos.y += 1;
+            }
+            cursor::Direction::Left => {
+                if self.cursor.pos.x != 0 {
+                    self.cursor.save_pos();
+                    self.cursor.pos.x -= 1;
+                }
+            }
+            cursor::Direction::Right => {
+                // TODO(nokaa): We don't want to extend beyond the
+                // line length here, but we first need a way to
+                // determine a given line's length.
+                self.cursor.save_pos();
+                self.cursor.pos.x += 1;
+            }
+        }
+    }
+
     /// Changes the value of the `quit` attribute to `true`.
     pub fn quit(&mut self) {
         self.quit = true;
