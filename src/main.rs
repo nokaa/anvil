@@ -23,8 +23,8 @@ fn main() {
                        .arg_from_usage("[OUTPUT] 'Sets the output file to use'")
                        .get_matches();
 
-    // For now we are just reading from stdin, so we check to see if the user passed a file to
-    // output to. Otherwise we output to stdout
+    // For now we are just reading from stdin, so we check to see if the
+    // user passed a file to output to. Otherwise we output to stdout.
     if let Some(file) = matches.value_of("OUTPUT") {
         let mut editor = editor::Editor::new(file);
         let mut term = term::Term::new(&mut editor);

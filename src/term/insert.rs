@@ -28,7 +28,8 @@ pub fn handle(term: &mut Term, ch: char) {
         }
         '\t' => {
             for i in 0..4 {
-                term.term[(term.cursor.pos.x + i, term.cursor.pos.y)].set_ch(' ');
+                let x = term.cursor.pos.x + i;
+                term.term[(x, term.cursor.pos.y)].set_ch(' ');
             }
             term.cursor.save_pos();
             term.cursor.pos.x += 4;

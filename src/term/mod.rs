@@ -147,7 +147,9 @@ impl<'a> Term<'a> {
                     if self.cursor.pos.y != self.term.rows() - 3 {
                         self.cursor.save_pos();
                         self.cursor.pos.y += 1;
-                    } else if self.cursor.pos.y + self.current_line() < self.total_lines() - 1 {
+                    } else if self.cursor.pos.y + self.current_line() <
+                              self.total_lines() - 1
+                    {
                         let current_line = self.current_line();
                         self.set_current_line(current_line + 1);
                         self.redraw_file();

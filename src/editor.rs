@@ -40,8 +40,8 @@ impl<'a> Editor<'a> {
             contents = vec![vec![b'F', b'o', b'r', b'g', b'e']];
         } else {
             if file::file_exists(filename) {
-                // It *should* be safe to unwrap here, since we have already checked
-                // that `filename` exists.
+                // It *should* be safe to unwrap here, since we have already
+                // checked that `filename` exists.
                 contents = file::read_file_lines(filename).unwrap();
             } else {
                 contents = vec![vec![]];
