@@ -27,9 +27,12 @@ fn main() {
     // output to. Otherwise we output to stdout
     if let Some(file) = matches.value_of("OUTPUT") {
         let mut editor = editor::Editor::new(file);
-        terminal::run(&mut editor);
+        let mut term = terminal::Term::new(&mut editor);
+        term.run();
     } else {
         let mut editor = editor::Editor::new("");
-        terminal::run(&mut editor);
+        let mut term = terminal::Term::new(&mut editor);
+        term.run();
+        //terminal::run(&mut editor);
     }
 }
