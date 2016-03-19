@@ -10,7 +10,7 @@ extern crate rustty;
 
 mod editor;
 mod file;
-mod terminal;
+mod term;
 
 use clap::App;
 
@@ -27,12 +27,11 @@ fn main() {
     // output to. Otherwise we output to stdout
     if let Some(file) = matches.value_of("OUTPUT") {
         let mut editor = editor::Editor::new(file);
-        let mut term = terminal::Term::new(&mut editor);
+        let mut term = term::Term::new(&mut editor);
         term.run();
     } else {
         let mut editor = editor::Editor::new("");
-        let mut term = terminal::Term::new(&mut editor);
+        let mut term = term::Term::new(&mut editor);
         term.run();
-        //terminal::run(&mut editor);
     }
 }
