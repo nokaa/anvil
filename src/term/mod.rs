@@ -27,7 +27,7 @@ impl<'a> Term<'a> {
 
 /// Launches the terminal
     pub fn run(&mut self) {
-        self.term[(self.cursor.pos.x, self.cursor.pos.y)].set_bg(self.cursor.color);
+        self.term[self.cursor.current_pos()].set_bg(self.cursor.color);
         self.print_file();
         self.prompt();
         self.term.swap_buffers().unwrap();
@@ -83,7 +83,7 @@ impl<'a> Term<'a> {
                             } else {
                                 self.cursor.pos.x -= 1;
                             }
-                            self.term[(self.cursor.pos.x, self.cursor.pos.y)].set_ch(' ');
+                            self.term[self.cursor.current_pos()].set_ch(' ');
                         }
                         '\r' => {
                             self.cursor.lpos = self.cursor.pos;
@@ -98,7 +98,7 @@ impl<'a> Term<'a> {
                             self.cursor.pos.x += 4;
                         }
                         c @ _ => {
-                            self.term[(self.cursor.pos.x, self.cursor.pos.y)].set_ch(c);
+                            self.term[self.cursor.current_pos()].set_ch(c);
                             self.cursor.lpos = self.cursor.pos;
                             self.cursor.pos.x += 1;
                         }
@@ -106,20 +106,20 @@ impl<'a> Term<'a> {
                 }
 
                 if self.cursor.pos.x >= self.term.cols() - 1 {
-                    self.term[(self.cursor.lpos.x, self.cursor.lpos.y)].set_bg(Color::Default);
+                    self.term[self.cursor.last_pos()].set_bg(Color::Default);
                     self.cursor.lpos = self.cursor.pos;
                     self.cursor.pos.x = 0;
                     self.cursor.pos.y += 1;
                 }
                 if self.cursor.pos.y >= self.term.rows() - 1 {
-                    self.term[(self.cursor.lpos.x, self.cursor.lpos.y)].set_bg(Color::Default);
+                    self.term[self.cursor.last_pos()].set_bg(Color::Default);
                     self.cursor.lpos = self.cursor.pos;
                     self.cursor.pos.x = 0;
                     self.cursor.pos.y = 0;
                 }
 
-                self.term[(self.cursor.lpos.x, self.cursor.lpos.y)].set_bg(Color::Default);
-                self.term[(self.cursor.pos.x, self.cursor.pos.y)].set_bg(self.cursor.color);
+                self.term[self.cursor.last_pos()].set_bg(Color::Default);
+                self.term[self.cursor.current_pos()].set_bg(self.cursor.color);
                 self.term.swap_buffers().unwrap();
             }
         }
