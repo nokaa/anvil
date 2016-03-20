@@ -22,7 +22,7 @@ pub fn read_file(filename: &str) -> Result<Vec<u8>, io::Error> {
 /// Reads all data from `filename`, putting each line into a
 /// `Vec<u8>`. A vector of all the lines, `Vec<Vec<u8>>` is
 /// returned if successful.
-pub fn read_file_lines(filename: &str) -> Result<Vec<Vec<u8>>, io::Error> {
+pub fn read_file_lines(filename: &str, line_length: usize) -> Result<Vec<Vec<u8>>, io::Error> {
     let f = try!(File::open(filename));
     let mut lines: Vec<Vec<u8>> = vec![];
     let mut line: Vec<u8> = vec![];
@@ -32,13 +32,21 @@ pub fn read_file_lines(filename: &str) -> Result<Vec<Vec<u8>>, io::Error> {
             Err(e) => return Err(e),
             Ok(b) => match b {
                 b'\n' => {
+                    line.push(b);
                     lines.push(line);
                     line = vec![];
                 }
                 // We do nothing on the carriage return for now.
                 // TODO(nokaa): We should decide what to do here.
                 b'\r' => { }
-                _ => line.push(b),
+                _ => {
+                    if line.len() == line_length {
+                        lines.push(line);
+                        line = vec![b];
+                    } else {
+                        line.push(b);
+                    }
+                }
             }
         }
     }

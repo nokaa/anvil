@@ -33,19 +33,22 @@ pub struct Term<'a> {
 
 impl<'a> Term<'a> {
     pub fn new(editor: &'a mut editor::Editor<'a>) -> Term<'a> {
-        let total_lines = editor.contents.len();
         Term {
             cursor: cursor::Cursor::new(Color::Red),
             editor: editor,
             term: rustty::Terminal::new().unwrap(),
             quit: false,
             line: 0,
-            total_lines: total_lines,
+            total_lines: 0,
         }
     }
 
     /// Launches the terminal.
     pub fn run(&mut self) {
+        self.editor.read_file(self.term.cols());
+        let lines = self.editor.contents.len() as isize;
+        self.set_total_lines(lines);
+
         self.term[self.cursor.current_pos()].set_bg(self.cursor.color);
         let current_line = self.current_line();
         self.print_file(current_line);
@@ -106,18 +109,12 @@ impl<'a> Term<'a> {
                 continue;
             }
 
-            for b in line {
-                self.term[(j, i - start)].set_ch(*b as char);
-                j += 1;
-                // If the current line is longer than term width, we move
-                // to a new line.
-                //
-                // TODO(nokaa): If line-width is greater than term width,
-                // we should insert a new line our editor array
-                if j == w {
-                    j = 0;
-                    i += 1;
+            for &b in line {
+                if b == b'\n' {
+                    continue;
                 }
+                self.term[(j, i - start)].set_ch(b as char);
+                j += 1;
             }
             while j < w {
                 self.term[(j, i - start)].set_ch(' ');
