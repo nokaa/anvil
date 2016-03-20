@@ -140,6 +140,15 @@ impl<'a> Term<'a> {
                     self.set_current_line(current_line - 1);
                     self.redraw_file();
                 }
+                let curr = self.cursor.pos.y + self.current_line();
+                let len = self.editor.contents[curr].len() - 1;
+                if self.cursor.pos.x > len {
+                    if self.editor.contents[curr][len] == b'\n' && len > 0{
+                        self.cursor.pos.x = len - 1;
+                    } else {
+                        self.cursor.pos.x = len;
+                    }
+                }
             }
             cursor::Direction::Down => {
                 if self.total_lines() <= self.term.rows() - 3 {
@@ -159,6 +168,15 @@ impl<'a> Term<'a> {
                         let current_line = self.current_line();
                         self.set_current_line(current_line + 1);
                         self.redraw_file();
+                    }
+                }
+                let curr = self.cursor.pos.y + self.current_line();
+                let len = self.editor.contents[curr].len() - 1;
+                if self.cursor.pos.x > len {
+                    if self.editor.contents[curr][len] == b'\n' && len > 0{
+                        self.cursor.pos.x = len - 1;
+                    } else {
+                        self.cursor.pos.x = len;
                     }
                 }
             }
