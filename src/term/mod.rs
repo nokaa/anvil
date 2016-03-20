@@ -64,7 +64,7 @@ impl<'a> Term<'a> {
                     insert::handle(self, ch);
                 }
 
-                if self.cursor.pos.x >= self.term.cols() - 1 {
+                if self.cursor.pos.x > self.term.cols() - 1 {
                     self.term[self.cursor.last_pos()].set_bg(Color::Default);
                     self.cursor.save_pos();
                     self.cursor.pos.x = 0;
@@ -170,7 +170,13 @@ impl<'a> Term<'a> {
             }
             cursor::Direction::Right => {
                 let curr = self.cursor.pos.y + self.current_line();
-                if self.cursor.pos.x != self.editor.contents[curr].len() - 1 {
+                let len = self.editor.contents[curr].len() - 1;
+                if self.editor.contents[curr][len] == b'\n' {
+                    if self.cursor.pos.x != len - 1 {
+                        self.cursor.save_pos();
+                        self.cursor.pos.x += 1;
+                    }
+                } else if self.cursor.pos.x != len {
                     self.cursor.save_pos();
                     self.cursor.pos.x += 1;
                 }
