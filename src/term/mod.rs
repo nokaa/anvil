@@ -109,6 +109,15 @@ impl<'a> Term<'a> {
             for b in line {
                 self.term[(j, i - start)].set_ch(*b as char);
                 j += 1;
+                // If the current line is longer than term width, we move
+                // to a new line.
+                //
+                // TODO(nokaa): If line-width is greater than term width,
+                // we should insert a new line our editor array
+                if j == w {
+                    j = 0;
+                    i += 1;
+                }
             }
             while j < w {
                 self.term[(j, i - start)].set_ch(' ');
