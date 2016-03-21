@@ -41,6 +41,13 @@ pub fn handle(term: &mut Term, ch: char) {
             }
         }
         'w' => {
+            match term.editor.write_file() {
+                Ok(_) => { }
+                Err(e) => {
+                    term.quit();
+                    println!("{}", e);
+                }
+            }
         }
         'q' => {
             term.quit();

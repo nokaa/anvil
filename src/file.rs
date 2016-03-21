@@ -70,6 +70,15 @@ pub fn write_file(filename: &str, data: &[u8]) -> Result<(), io::Error> {
     Ok(())
 }
 
+pub fn write_file_lines(filename: &str, data: &Vec<Vec<u8>>) -> Result<(), io::Error> {
+    let mut file = try!(File::create(filename));
+    for line in data {
+        try!(file.write(&line[..]));
+    }
+
+    Ok(())
+}
+
 #[allow(dead_code)]
 /// Takes a `&[u8]` and returns a `Vec<u8>` containing all values
 /// until the first 0.

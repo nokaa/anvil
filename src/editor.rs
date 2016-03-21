@@ -60,6 +60,20 @@ impl<'a> Editor<'a> {
         }
     }
 
+    pub fn write_file(&mut self) -> Result<(), String> {
+        let filename = self.filename;
+        let contents = &self.contents;
+
+        if filename == "" {
+            return Err(String::from("No filename given!"));
+        } else {
+            match file::write_file_lines(filename, contents) {
+                Ok(_) => return Ok(()),
+                Err(e) => return Err(format!("{}", e)),
+            }
+        }
+    }
+
     /// Returns the name of the file we are working with.
     pub fn filename(&self) -> &str {
         self.filename
