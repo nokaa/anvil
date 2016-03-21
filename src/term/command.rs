@@ -6,6 +6,7 @@
  */
 
 use super::{Term, cursor};
+use rustty::{Event};
 
 pub fn handle(term: &mut Term, ch: char) {
     match ch {
@@ -23,6 +24,21 @@ pub fn handle(term: &mut Term, ch: char) {
         }
         'l' => {
             term.move_cursor(cursor::Direction::Right);
+        }
+        'r' => {
+            let evt = term.term.get_event(-1).unwrap();
+            if let Some(Event::Key(ch)) = evt {
+                match ch {
+                    '\x1b' | '\x7f' => { }
+                    // TODO(nokaa): ENTER and TAB are ignored for now.
+                    '\r' | '\t' => { }
+                    c @ _ => {
+                        term.term[term.cursor.current_pos()].set_ch(c);
+                    }
+                }
+            }
+        }
+        'w' => {
         }
         'q' => {
             term.quit();
