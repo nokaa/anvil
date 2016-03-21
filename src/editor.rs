@@ -80,4 +80,9 @@ impl<'a> Editor<'a> {
             Insert => self.mode = Command,
         }
     }
+
+    pub fn replace_char(&mut self, (x, y): (usize, usize), c: char) {
+        // contents[line][position in line]
+        self.contents[y][x] = c as u8;
+    }
 }

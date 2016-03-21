@@ -33,7 +33,9 @@ pub fn handle(term: &mut Term, ch: char) {
                     // TODO(nokaa): ENTER and TAB are ignored for now.
                     '\r' | '\t' => { }
                     c @ _ => {
-                        term.term[term.cursor.current_pos()].set_ch(c);
+                        let pos = term.cursor.current_pos();
+                        term.term[pos].set_ch(c);
+                        term.editor.replace_char(pos, c);
                     }
                 }
             }
