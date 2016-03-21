@@ -13,17 +13,22 @@ pub fn handle(term: &mut Term, ch: char) {
             term.editor.switch_mode();
         }
         '\x7f' => { // Backspace key
+            let line = term.current_line() + term.cursor.pos.y;
+            let pos = term.cursor.pos.x;
             term.cursor.save_pos();
             if term.cursor.pos.x == 0 {
-                term.cursor.pos.y = term.cursor.pos.y.saturating_sub(1);
+                term.editor.contents.remove(line);
+                if term.cursor.pos.y != 0 {
+                    term.cursor.pos.y -= 1;
+                }
 
-                let curr = term.cursor.pos.y + term.current_line();
-                let len = term.editor.contents[curr].len() - 1;
+                let line = term.current_line() + term.cursor.pos.y;
+                let len = term.editor.contents[line].len() - 1;
                 term.cursor.pos.x = len;
+                term.redraw_file();
             } else {
                 term.cursor.pos.x -= 1;
             }
-            term.term[term.cursor.current_pos()].set_ch(' ');
         }
         '\r' => {
             let line = term.current_line() + term.cursor.pos.y;
@@ -42,6 +47,9 @@ pub fn handle(term: &mut Term, ch: char) {
             term.cursor.pos.x += 4;
         }
         c @ _ => {
+            /*let line = term.current_line() + term.cursor.pos.y;
+            let pos = term.cursor.pos.x;
+            term.editor.contents[line, pos*/
             term.term[term.cursor.current_pos()].set_ch(c);
             term.cursor.save_pos();
             term.cursor.pos.x += 1;
