@@ -236,4 +236,22 @@ impl<'a> Term<'a> {
         let current_line = self.current_line();
         self.print_file(current_line);
     }
+
+    /// This function redraws the given line of the UI on the screen.
+    pub fn redraw_line(&mut self, ui_line: usize) {
+        let file_line = ui_line + self.current_line();
+        self.print_line(ui_line, file_line);
+    }
+
+    pub fn print_line(&mut self, ui_line: usize, file_line: usize) {
+        let contents = &self.editor.contents[file_line];
+        let mut i = 0;
+        for &b in contents {
+            if b == b'\n' {
+                continue;
+            }
+            self.term[(i, ui_line)].set_ch(b as char);
+            i += 1;
+        }
+    }
 }

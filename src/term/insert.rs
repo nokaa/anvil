@@ -20,20 +20,18 @@ pub fn handle(term: &mut Term, ch: char) {
                 let curr = term.cursor.pos.y + term.current_line();
                 let len = term.editor.contents[curr].len() - 1;
                 term.cursor.pos.x = len;
-                /*if term.editor.contents[curr][len] == b'\n' && len > 0 {
-                    term.cursor.pos.x = len - 1;
-                } else {
-                    term.cursor.pos.x = len;
-                }*/
             } else {
                 term.cursor.pos.x -= 1;
             }
             term.term[term.cursor.current_pos()].set_ch(' ');
         }
         '\r' => {
+            let line = term.current_line() + term.cursor.pos.y;
+            term.editor.contents.insert(line, vec![b'\n']);
             term.cursor.save_pos();
             term.cursor.pos.x = 0;
             term.cursor.pos.y += 1;
+            term.redraw_file();
         }
         '\t' => {
             for i in 0..4 {
