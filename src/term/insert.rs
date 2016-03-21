@@ -16,6 +16,15 @@ pub fn handle(term: &mut Term, ch: char) {
             term.cursor.save_pos();
             if term.cursor.pos.x == 0 {
                 term.cursor.pos.y = term.cursor.pos.y.saturating_sub(1);
+
+                let curr = term.cursor.pos.y + term.current_line();
+                let len = term.editor.contents[curr].len() - 1;
+                term.cursor.pos.x = len;
+                /*if term.editor.contents[curr][len] == b'\n' && len > 0 {
+                    term.cursor.pos.x = len - 1;
+                } else {
+                    term.cursor.pos.x = len;
+                }*/
             } else {
                 term.cursor.pos.x -= 1;
             }
