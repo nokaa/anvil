@@ -190,7 +190,7 @@ impl<'a> Term<'a> {
                 let curr = self.cursor.pos.y + self.current_line();
                 let len = self.editor.contents[curr].len() - 1;
                 if self.editor.contents[curr][len] == b'\n' {
-                    if self.cursor.pos.x != len - 1 {
+                    if len > 0 && self.cursor.pos.x != len - 1 {
                         self.cursor.save_pos();
                         self.cursor.pos.x += 1;
                     }
