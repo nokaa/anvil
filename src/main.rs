@@ -6,6 +6,7 @@
  */
 
 extern crate clap;
+extern crate crypto;
 extern crate rustty;
 
 mod editor;

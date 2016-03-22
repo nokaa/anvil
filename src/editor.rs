@@ -15,6 +15,8 @@ pub struct Editor<'a> {
     /// Represents the name of the file
     /// we are working with
     filename: &'a str,
+    /// A hash of the original file's contents
+    hash: String,
     /// Represents the contents of the file
     pub contents: Vec<Vec<u8>>,
 }
@@ -36,11 +38,13 @@ impl<'a> Editor<'a> {
     /// given filename is read as the contents.
     pub fn new(filename: &str) -> Editor {
         let contents: Vec<Vec<u8>> = vec![vec![]];
+        let hash = String::new();
 
         Editor {
             mode: EditorMode::Command,
             filename: filename,
             contents: contents,
+            hash: hash,
         }
     }
 
@@ -58,6 +62,9 @@ impl<'a> Editor<'a> {
             self.contents = file::read_file_lines(filename, line_length)
                 .unwrap();
         }
+
+        let hash = file::sha512_file(filename).unwrap();
+        self.hash = hash;
     }
 
     pub fn write_file(&mut self) -> Result<(), String> {
@@ -98,5 +105,9 @@ impl<'a> Editor<'a> {
     pub fn replace_char(&mut self, (x, y): (usize, usize), c: char) {
         // contents[line][position in line]
         self.contents[y][x] = c as u8;
+    }
+
+    pub fn hash(&self) -> String {
+        self.hash.clone()
     }
 }

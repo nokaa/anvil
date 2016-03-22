@@ -8,6 +8,9 @@
 use std::fs::File;
 use std::io::{self, Read, Write};
 
+use crypto::digest::Digest;
+use crypto::sha2::Sha512;
+
 /// Reads all data from `filename`, putting each line into a
 /// `Vec<u8>`. A vector of all the lines, `Vec<Vec<u8>>` is
 /// returned if successful.
@@ -59,4 +62,17 @@ pub fn write_file_lines(filename: &str, data: &Vec<Vec<u8>>) -> Result<(), io::E
     }
 
     Ok(())
+}
+
+pub fn sha512_file(filename: &str) -> Result<String, io::Error> {
+    // Read file contents for hashing
+    let mut f = try!(File::open(filename));
+    let mut buf: Vec<u8> = vec![];
+    try!(f.read_to_end(&mut buf));
+
+    let mut hasher = Sha512::new();
+    hasher.input(&buf);
+
+    let hex = hasher.result_str();
+    Ok(hex)
 }
