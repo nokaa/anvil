@@ -14,7 +14,6 @@ pub fn handle(term: &mut Term, ch: char) {
         }
         '\x7f' => { // Backspace key
             let line = term.current_line() + term.cursor.pos.y;
-            let pos = term.cursor.pos.x;
             term.cursor.save_pos();
             if term.cursor.pos.x == 0 {
                 term.editor.contents.remove(line);
@@ -28,6 +27,9 @@ pub fn handle(term: &mut Term, ch: char) {
                 term.redraw_file();
             } else {
                 term.cursor.pos.x -= 1;
+                let pos = term.cursor.pos.x;
+                term.editor.contents[line].remove(pos);
+                term.redraw_file();
             }
         }
         '\r' => {
