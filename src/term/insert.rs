@@ -16,14 +16,18 @@ pub fn handle(term: &mut Term, ch: char) {
             let line = term.current_line() + term.cursor.pos.y;
             term.cursor.save_pos();
             if term.cursor.pos.x == 0 {
+                let mut rem = term.editor.contents[line].clone();
+                let pos = term.editor.contents[line - 1].len() - 1;
+                term.editor.contents[line - 1].remove(pos);
+                term.editor.contents[line - 1].append(&mut rem);
                 term.editor.contents.remove(line);
                 if term.cursor.pos.y != 0 {
                     term.cursor.pos.y -= 1;
                 }
 
-                let line = term.current_line() + term.cursor.pos.y;
-                let len = term.editor.contents[line].len() - 1;
-                term.cursor.pos.x = len;
+                //let line = term.current_line() + term.cursor.pos.y;
+                //let len = term.editor.contents[line].len() - 1;
+                term.cursor.pos.x = pos;
                 term.redraw_file();
             } else {
                 term.cursor.pos.x -= 1;
