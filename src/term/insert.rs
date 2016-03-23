@@ -40,7 +40,11 @@ pub fn handle(term: &mut Term, ch: char) {
         }
         '\r' => {
             let line = term.current_line() + term.cursor.pos.y;
-            term.editor.contents.insert(line, vec![b'\n']);
+            let pos = term.cursor.pos.x;
+
+            let mut rem = term.editor.contents[line].split_off(pos);
+            rem.push(b'\n');
+            term.editor.contents.insert(line + 1, rem);
 
             term.cursor.save_pos();
             term.cursor.pos.x = 0;
