@@ -61,10 +61,10 @@ impl<'a> Editor<'a> {
             // checked that `filename` exists.
             self.contents = file::read_file_lines(filename, line_length)
                 .unwrap();
-        }
 
-        let hash = file::sha512_file(filename).unwrap();
-        self.hash = hash;
+            let hash = file::sha512_file(filename).unwrap();
+            self.hash = hash;
+        }
     }
 
     pub fn write_file(&mut self) -> Result<(), String> {
