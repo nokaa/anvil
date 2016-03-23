@@ -10,6 +10,11 @@ use super::Term;
 pub fn handle(term: &mut Term, ch: char) {
     match ch {
         '\x1b' => { // Escape key
+            term.cursor.save_pos();
+            if term.cursor.pos.x > 0 {
+                term.cursor.pos.x -= 1;
+            }
+
             term.editor.switch_mode();
         }
         '\x7f' => { // Backspace key
