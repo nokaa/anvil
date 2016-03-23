@@ -8,19 +8,20 @@ file contents in a user interface, and we also have a basic prompt which
 shows the filename.
 
 We are now able to write changes made to file, but this only occurs if we
-make our changes in command mode using `r`, the replace command.
+make our changes in command mode using `r`, the replace command. We can
+also delete things in insert mode and write the changes to file.
 
 ### Coming Soon (TM)
 - Storing changes made in insert mode
 - Completing the replace command implementation
 - More stable file writing implementation; e.g. writing to a temp file
-- Proper backspace handling in insert mode
 - Split command mode into command mode and normal mode
 
 ### Build
 To build forge, you must have the Rust compiler and Cargo installed on
 your system. Forge is tested on the current stable, beta, and nightly
-compilers.
+compilers. Forge is currently only tested on Linux. Forge does not build
+on OSX due to an issue with rustty, and build status on Windows is unknown.
 
 ```
 git clone http://github.com/nokaa/forge
