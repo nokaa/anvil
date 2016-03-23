@@ -58,13 +58,16 @@ pub fn handle(term: &mut Term, ch: char) {
             term.redraw_file();
         }
         '\t' => {
+            let line = term.current_line() + term.cursor.pos.y;
+            let pos = term.cursor.pos.x;
+
             for i in 0..4 {
-                let x = term.cursor.pos.x + i;
-                term.term[(x, term.cursor.pos.y)].set_ch(' ');
+                term.editor.contents[line].insert(pos, b' ');
             }
 
             term.cursor.save_pos();
             term.cursor.pos.x += 4;
+            term.redraw_file();
         }
         c @ _ => {
             let line = term.current_line() + term.cursor.pos.y;
