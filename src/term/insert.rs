@@ -22,7 +22,7 @@ pub fn handle(term: &mut Term, ch: char) {
             let line = term.current_line() + term.cursor.pos.y;
             term.cursor.save_pos();
 
-            if term.cursor.pos.x == 0 {
+            if term.cursor.pos.x == 0 && line > 0 {
                 let mut rem = term.editor.contents[line].clone();
                 let pos = term.editor.contents[line - 1].len() - 1;
 
@@ -36,7 +36,7 @@ pub fn handle(term: &mut Term, ch: char) {
 
                 term.cursor.pos.x = pos;
                 term.redraw_file();
-            } else {
+            } else if term.cursor.pos.x > 0 {
                 term.cursor.pos.x -= 1;
                 let pos = term.cursor.pos.x;
 
