@@ -5,6 +5,7 @@
 
 ### Normal mode
 - r - Replace the character under the cursor
+- x - Delete the character under the cursor
 - i - Enter insert mode
 - h - Move left
 - j - Move down

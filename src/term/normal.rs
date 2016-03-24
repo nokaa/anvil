@@ -44,6 +44,11 @@ pub fn handle(term: &mut Term, ch: char) {
                 }
             }
         }
+        'x' => {
+            let (x, y) = term.cursor.current_pos();
+            term.editor.contents[y].remove(x);
+            term.redraw_file();
+        }
         _ => { }
     }
 }
