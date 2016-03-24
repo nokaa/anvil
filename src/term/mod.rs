@@ -256,5 +256,10 @@ impl<'a> Term<'a> {
             self.term[(i, ui_line)].set_ch(b as char);
             i += 1;
         }
+
+        while i < self.term.cols() {
+            self.term[(i, ui_line)].set_ch(' ');
+            i += 1;
+        }
     }
 }

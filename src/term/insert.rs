@@ -41,7 +41,9 @@ pub fn handle(term: &mut Term, ch: char) {
                 let pos = term.cursor.pos.x;
 
                 term.editor.contents[line].remove(pos);
-                term.redraw_file();
+
+                let y = term.cursor.pos.y;
+                term.redraw_line(y);
             }
         }
         '\r' => {
@@ -68,7 +70,9 @@ pub fn handle(term: &mut Term, ch: char) {
 
             term.cursor.save_pos();
             term.cursor.pos.x += 4;
-            term.redraw_file();
+
+            let y = term.cursor.pos.y;
+            term.redraw_line(y);
         }
         c @ _ => {
             let line = term.current_line() + term.cursor.pos.y;
@@ -78,7 +82,9 @@ pub fn handle(term: &mut Term, ch: char) {
 
             term.cursor.save_pos();
             term.cursor.pos.x += 1;
-            term.redraw_file();
+
+            let y = term.cursor.pos.y;
+            term.redraw_line(y);
         }
     }
 }
