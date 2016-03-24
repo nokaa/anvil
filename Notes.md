@@ -22,3 +22,13 @@ modified line, which is O(n). In the case of a line being added/removed,
 we will likely be forced to redraw the entire file in O(n^2) time. This
 is much better, because most modifications will not be adding/removing
 line.
+
+#### 3/23/16
+When we write a file to disk, we are currently just writing directly to
+the filename given. I think that I remember reading somewhere that you
+should not do this, because if the write fails the old file will be gone.
+If I remember correctly, you should write to a different file and then
+rename it to the original file's name. Another thing is that Vim uses
+a swap file for reasons that I not entirely sure of. I know that one
+of it's purposes is to prevent editing a file in multiple instances
+of Vim.
