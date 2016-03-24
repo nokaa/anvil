@@ -33,6 +33,7 @@ pub struct Term<'a> {
 }
 
 impl<'a> Term<'a> {
+    /// Creates a new `Term` using the given `editor`.
     pub fn new(editor: &'a mut editor::Editor<'a>) -> Term<'a> {
         Term {
             cursor: cursor::Cursor::new(Color::Red),
@@ -132,6 +133,7 @@ impl<'a> Term<'a> {
         }
     }
 
+    /// Handles moving the cursor
     pub fn move_cursor(&mut self, direction: cursor::Direction) {
         match direction {
             cursor::Direction::Up => {

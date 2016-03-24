@@ -14,7 +14,9 @@ use crypto::sha2::Sha512;
 /// Reads all data from `filename`, putting each line into a
 /// `Vec<u8>`. A vector of all the lines, `Vec<Vec<u8>>` is
 /// returned if successful.
-pub fn read_file_lines(filename: &str, line_length: usize) -> Result<Vec<Vec<u8>>, io::Error> {
+pub fn read_file_lines(filename: &str, line_length: usize)
+    -> Result<Vec<Vec<u8>>, io::Error>
+{
     let f = try!(File::open(filename));
     let mut lines: Vec<Vec<u8>> = vec![];
     let mut line: Vec<u8> = vec![];
@@ -55,7 +57,9 @@ pub fn file_exists(filename: &str) -> bool {
 }
 
 /// Writes all data in `data` to `filename`.
-pub fn write_file_lines(filename: &str, data: &Vec<Vec<u8>>) -> Result<(), io::Error> {
+pub fn write_file_lines(filename: &str, data: &Vec<Vec<u8>>)
+    -> Result<(), io::Error>
+{
     let mut file = try!(File::create(filename));
     for line in data {
         try!(file.write(&line[..]));
@@ -64,6 +68,8 @@ pub fn write_file_lines(filename: &str, data: &Vec<Vec<u8>>) -> Result<(), io::E
     Ok(())
 }
 
+/// Returns a `String` representation of the sha512 hash of `filename`
+/// on success, returns an `io::Error` on an error.
 pub fn sha512_file(filename: &str) -> Result<String, io::Error> {
     // Read file contents for hashing
     let mut f = try!(File::open(filename));

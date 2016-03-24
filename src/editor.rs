@@ -35,9 +35,8 @@ pub enum EditorMode {
 }
 
 impl<'a> Editor<'a> {
-    /// Creates a new editor. If filename is the empty
-    /// string, the contents are `Forge`. Otherwise, the
-    /// given filename is read as the contents.
+    /// Creates a new editor. `contents` and `hash` are initialized
+    /// to their respective types, but contain no data.
     pub fn new(filename: &str) -> Editor {
         let contents: Vec<Vec<u8>> = vec![vec![]];
         let hash = String::new();
@@ -53,7 +52,9 @@ impl<'a> Editor<'a> {
     /// Reads `self.filename` to a vector of lines. A line is determined
     /// by a newline character, or when a line's length is the same as
     /// the given `line_length`. `\n` is included in the line, and must
-    /// be ignored when printing in the UI.
+    /// be ignored when printing in the UI. The file contents are stored
+    /// as the value of `self`'s contents. A hash of the file is also
+    /// read and stored.
     pub fn read_file(&mut self, line_length: usize) {
         let filename = self.filename;
         if filename == "" {
@@ -69,6 +70,10 @@ impl<'a> Editor<'a> {
         }
     }
 
+    /// Writes the data in `self.contents` to `self.filename`.
+    //
+    // TODO(nokaa): We should write to file in a way that does
+    // not risk damaging the original file in case of an error.
     pub fn write_file(&mut self) -> Result<(), String> {
         let filename = self.filename;
         let contents = &self.contents;
@@ -81,6 +86,12 @@ impl<'a> Editor<'a> {
                 Err(e) => return Err(format!("{}", e)),
             }
         }
+    }
+
+    /// Replaces the byte in line `y`, position `x` with `c` as a `u8`.
+    pub fn replace_char(&mut self, (x, y): (usize, usize), c: char) {
+        // contents[line][position in line]
+        self.contents[y][x] = c as u8;
     }
 
     /// Returns the name of the file we are working with.
@@ -103,19 +114,9 @@ impl<'a> Editor<'a> {
     /// Switches the mode that the editor is in.
     pub fn switch_mode(&mut self, mode: EditorMode) {
         self.mode = mode;
-        /*use self::EditorMode::*;
-
-        match self.mode {
-            Command => self.mode = Insert,
-            Insert => self.mode = Command,
-        }*/
     }
 
-    pub fn replace_char(&mut self, (x, y): (usize, usize), c: char) {
-        // contents[line][position in line]
-        self.contents[y][x] = c as u8;
-    }
-
+    /// Returns the hash of our editor.
     pub fn hash(&self) -> String {
         self.hash.clone()
     }

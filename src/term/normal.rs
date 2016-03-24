@@ -9,6 +9,7 @@ use super::{Term, cursor};
 use editor::EditorMode;
 use rustty::{Event};
 
+/// Handles command `ch` for normal mode
 pub fn handle(term: &mut Term, ch: char) {
     match ch {
         'i' => {

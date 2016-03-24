@@ -8,6 +8,7 @@
 use super::Term;
 use editor::EditorMode;
 
+/// Handles `ch` for insert mode
 pub fn handle(term: &mut Term, ch: char) {
     match ch {
         '\x1b' => { // Escape key
@@ -46,7 +47,7 @@ pub fn handle(term: &mut Term, ch: char) {
                 term.redraw_line(y);
             }
         }
-        '\r' => {
+        '\r' => { // ENTER key
             let line = term.current_line() + term.cursor.pos.y;
             let pos = term.cursor.pos.x;
 
@@ -60,7 +61,7 @@ pub fn handle(term: &mut Term, ch: char) {
 
             term.redraw_file();
         }
-        '\t' => {
+        '\t' => { // TAB key
             let line = term.current_line() + term.cursor.pos.y;
             let pos = term.cursor.pos.x;
 
@@ -74,6 +75,8 @@ pub fn handle(term: &mut Term, ch: char) {
             let y = term.cursor.pos.y;
             term.redraw_line(y);
         }
+        // We should probably specify other special characters that
+        // we will ignore, such as arrow keys
         c @ _ => {
             let line = term.current_line() + term.cursor.pos.y;
             let pos = term.cursor.pos.x;

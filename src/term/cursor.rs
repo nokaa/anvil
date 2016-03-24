@@ -30,6 +30,7 @@ pub struct Cursor {
 }
 
 impl Cursor {
+    /// Creates a new cursor
     pub fn new(color: rustty::Color) -> Cursor {
         Cursor {
             pos: Position {x: 0, y: 0},
@@ -38,14 +39,17 @@ impl Cursor {
         }
     }
 
+    /// Returns a pair of the current `(x, y)` position
     pub fn current_pos(&self) -> (usize, usize) {
         (self.pos.x, self.pos.y)
     }
 
+    /// Returns a pair of the last `(x, y)` position
     pub fn last_pos(&self) -> (usize, usize) {
         (self.lpos.x, self.lpos.y)
     }
 
+    /// Stores the current position as the last position
     pub fn save_pos(&mut self) {
         self.lpos = self.pos;
     }

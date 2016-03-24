@@ -8,6 +8,7 @@
 use super::{Term};
 use editor::EditorMode;
 
+/// Handles command `ch` for command mode
 pub fn handle(term: &mut Term, ch: char) {
     match ch {
         '\x1b' => { // Escape key

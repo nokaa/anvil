@@ -21,11 +21,12 @@ fn main() {
                        .version("v0.1")
                        .author("nokaa <nokaa@cock.li>")
                        .about("A text editor")
-                       .arg_from_usage("[OUTPUT] 'Sets the output file to use'")
+                       .arg_from_usage("[FILE] 'The file to be edited'")
                        .get_matches();
 
-    // For now we are just reading from stdin, so we check to see if the
-    // user passed a file to output to. Otherwise we output to stdout.
+    // If the user passed a file as an arg, we create a new editor with
+    // it and run the UI. Otherwise, we create a new editor with a blank
+    // filename and run the UI.
     if let Some(file) = matches.value_of("OUTPUT") {
         let mut editor = editor::Editor::new(file);
         let mut term = term::Term::new(&mut editor);
