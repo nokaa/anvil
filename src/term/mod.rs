@@ -25,11 +25,12 @@ pub struct Term<'a> {
     term: rustty::Terminal,
     /// Represents the running status
     quit: bool,
-    /// Represents the topmost line in our UI
+    /// Represents the topmost line of the file we are editing in our UI
     line: usize,
     /// Represents the total number of lines in the currently
     /// open file
     total_lines: usize,
+    partial_lines: Vec<usize>,
 }
 
 impl<'a> Term<'a> {
@@ -42,12 +43,13 @@ impl<'a> Term<'a> {
             quit: false,
             line: 0,
             total_lines: 0,
+            partial_lines: vec![],
         }
     }
 
     /// Launches the terminal.
     pub fn run(&mut self) {
-        self.editor.read_file(self.term.cols());
+        self.editor.read_file();
         let lines = self.editor.contents.len() as isize;
         self.set_total_lines(lines);
 
@@ -104,6 +106,7 @@ impl<'a> Term<'a> {
 
     /// Prints our editor's contents to the UI.
     fn print_file(&mut self, start: usize) {
+        self.partial_lines = vec![];
         let w = self.term.cols();
         let mut i = 0;
         let mut j = 0;
@@ -116,7 +119,12 @@ impl<'a> Term<'a> {
             for &b in line {
                 if b == b'\n' {
                     continue;
+                } else if j == w {
+                    self.partial_lines.push(i - start);
+                    i += 1;
+                    j = 0;
                 }
+
                 self.term[(j, i - start)].set_ch(b as char);
                 j += 1;
             }
@@ -137,9 +145,17 @@ impl<'a> Term<'a> {
     pub fn move_cursor(&mut self, direction: cursor::Direction) {
         match direction {
             cursor::Direction::Up => {
-                if self.cursor.pos.y != 0 {
+                let mut y = self.cursor.pos.y;
+
+                if y != 0 {
                     self.cursor.save_pos();
-                    self.cursor.pos.y -= 1;
+                    while self.partial_lines.contains(&y) {
+                        if y == 1 {
+                            break;
+                        }
+                        y -= 1;
+                    }
+                    self.cursor.pos.y = y - 1;
                 } else if self.current_line() != 0 {
                     let current_line = self.current_line();
                     self.set_current_line(current_line - 1);
@@ -156,7 +172,13 @@ impl<'a> Term<'a> {
                 }
             }
             cursor::Direction::Down => {
+                let curr = self.current_line();
+                let w = self.term.cols();
+
                 if self.total_lines() <= self.term.rows() - 3 {
+                    if self.editor.contents[curr].len() > w {
+
+                    }
                     if self.cursor.pos.y != self.term.rows() - 3 &&
                        self.cursor.pos.y < self.total_lines() - 1
                     {
@@ -250,17 +272,23 @@ impl<'a> Term<'a> {
 
     pub fn print_line(&mut self, ui_line: usize, file_line: usize) {
         let contents = &self.editor.contents[file_line];
+        let w = self.term.cols();
         let mut i = 0;
+        let mut j = 0;
+
         for &b in contents {
             if b == b'\n' {
                 continue;
+            } else if i == w {
+                i = 0;
+                j += 1;
             }
-            self.term[(i, ui_line)].set_ch(b as char);
+            self.term[(i, ui_line + j)].set_ch(b as char);
             i += 1;
         }
 
         while i < self.term.cols() {
-            self.term[(i, ui_line)].set_ch(' ');
+            self.term[(i, ui_line + j)].set_ch(' ');
             i += 1;
         }
     }

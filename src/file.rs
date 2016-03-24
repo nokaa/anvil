@@ -14,7 +14,7 @@ use crypto::sha2::Sha512;
 /// Reads all data from `filename`, putting each line into a
 /// `Vec<u8>`. A vector of all the lines, `Vec<Vec<u8>>` is
 /// returned if successful.
-pub fn read_file_lines(filename: &str, line_length: usize)
+pub fn read_file_lines(filename: &str)
     -> Result<Vec<Vec<u8>>, io::Error>
 {
     let f = try!(File::open(filename));
@@ -34,12 +34,7 @@ pub fn read_file_lines(filename: &str, line_length: usize)
                 // TODO(nokaa): We should decide what to do here.
                 b'\r' => { }
                 _ => {
-                    if line.len() == line_length {
-                        lines.push(line);
-                        line = vec![b];
-                    } else {
-                        line.push(b);
-                    }
+                    line.push(b);
                 }
             }
         }

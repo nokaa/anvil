@@ -55,14 +55,14 @@ impl<'a> Editor<'a> {
     /// be ignored when printing in the UI. The file contents are stored
     /// as the value of `self`'s contents. A hash of the file is also
     /// read and stored.
-    pub fn read_file(&mut self, line_length: usize) {
+    pub fn read_file(&mut self) {
         let filename = self.filename;
         if filename == "" {
             self.contents = vec![vec![b'F', b'o', b'r', b'g', b'e']];
         } else if file::file_exists(filename) {
             // It *should* be safe to unwrap here, since we have already
             // checked that `filename` exists.
-            self.contents = file::read_file_lines(filename, line_length)
+            self.contents = file::read_file_lines(filename)
                 .unwrap();
 
             let hash = file::sha512_file(filename).unwrap();

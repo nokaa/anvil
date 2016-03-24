@@ -27,7 +27,7 @@ fn main() {
     // If the user passed a file as an arg, we create a new editor with
     // it and run the UI. Otherwise, we create a new editor with a blank
     // filename and run the UI.
-    if let Some(file) = matches.value_of("OUTPUT") {
+    if let Some(file) = matches.value_of("FILE") {
         let mut editor = editor::Editor::new(file);
         let mut term = term::Term::new(&mut editor);
         term.run();

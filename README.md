@@ -13,6 +13,7 @@ mode and command mode, and write these changes to disk.
 Please see `Commands.md` for a list of commands and their functions.
 
 ### Coming Soon (TM)
+- Handling of terminal resizing
 - Completing the replace command implementation
 - More stable file writing implementation; e.g. writing to a temp file
 - More useful information in the prompt; e.g. current line number
