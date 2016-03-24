@@ -220,16 +220,23 @@ impl<'a> Term<'a> {
                 }
             }
             cursor::Direction::Right => {
-                let curr = self.cursor.pos.y + self.current_line();
-                let len = self.editor.contents[curr].len() - 1;
-                if self.editor.contents[curr][len] == b'\n' {
-                    if len > 0 && self.cursor.pos.x != len - 1 {
-                        self.cursor.save_pos();
-                        self.cursor.pos.x += 1;
-                    }
-                } else if self.cursor.pos.x != len {
+                let partials = self.partial_lines.len();
+                let (x, y) = self.cursor.current_pos();
+                let curr = self.current_line() + y;// - partials;
+                let len = self.editor.contents[curr].len() - 2;
+
+                if len + 1 > self.term.cols() - 1 {
+
+                }
+                if x < len && x < self.term.cols() - 1 {
                     self.cursor.save_pos();
                     self.cursor.pos.x += 1;
+                } else if x < len && self.partial_lines.contains(&(y + 1)) {
+                    self.cursor.save_pos();
+                    self.cursor.pos.x = 0;
+                    self.cursor.pos.y += 1;
+                }
+                if self.partial_lines.contains(&(y+1)) {
                 }
             }
         }
