@@ -3,9 +3,9 @@ Forge is my experiment with text editors. I wanted to see what makes a
 text editor a text editor.
 
 At this time, Forge is shaping up to be a basic Vi clone. It currently
-has a very basic command mode and an insert mode. We are able to display
-file contents in a user interface, and we also have a basic prompt which
-shows the filename.
+has a very basic command and normal modes; and an insert mode. We are able
+to display file contents in a user interface, and we also have a basic
+prompt which shows the filename.
 
 We can now open and view files. We are able to modify files in insert
 mode and command mode, and write these changes to disk.
@@ -15,7 +15,8 @@ Please see `Commands.md` for a list of commands and their functions.
 ### Coming Soon (TM)
 - Completing the replace command implementation
 - More stable file writing implementation; e.g. writing to a temp file
-- Split command mode into command mode and normal mode
+- More useful information in the prompt; e.g. current line number
+- Gutter with line numbers
 
 ### Build
 To build forge, you must have the Rust compiler and Cargo installed on
