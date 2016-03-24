@@ -26,6 +26,8 @@ pub struct Editor<'a> {
 /// Vi editor.
 #[derive(PartialEq)]
 pub enum EditorMode {
+    /// Normal mode
+    Normal,
     /// Command mode
     Command,
     /// Insert mode
@@ -41,7 +43,7 @@ impl<'a> Editor<'a> {
         let hash = String::new();
 
         Editor {
-            mode: EditorMode::Command,
+            mode: EditorMode::Normal,
             filename: filename,
             contents: contents,
             hash: hash,
@@ -86,6 +88,12 @@ impl<'a> Editor<'a> {
         self.filename
     }
 
+    /// Returns true if we are in `Normal` mode,
+    /// false otherwise.
+    pub fn normal_mode(&self) -> bool {
+        self.mode == EditorMode::Normal
+    }
+
     /// Returns true if we are in `Command` mode,
     /// false otherwise.
     pub fn command_mode(&self) -> bool {
@@ -93,13 +101,14 @@ impl<'a> Editor<'a> {
     }
 
     /// Switches the mode that the editor is in.
-    pub fn switch_mode(&mut self) {
-        use self::EditorMode::*;
+    pub fn switch_mode(&mut self, mode: EditorMode) {
+        self.mode = mode;
+        /*use self::EditorMode::*;
 
         match self.mode {
             Command => self.mode = Insert,
             Insert => self.mode = Command,
-        }
+        }*/
     }
 
     pub fn replace_char(&mut self, (x, y): (usize, usize), c: char) {

@@ -8,6 +8,7 @@
 mod command;
 mod cursor;
 mod insert;
+mod normal;
 
 use rustty::{self, Event, Color};
 use editor;
@@ -58,7 +59,9 @@ impl<'a> Term<'a> {
         while !self.quit {
             let evt = self.term.get_event(100).unwrap();
             if let Some(Event::Key(ch)) = evt {
-                if self.editor.command_mode() {
+                if self.editor.normal_mode() {
+                    normal::handle(self, ch);
+                } else if self.editor.command_mode() {
                     command::handle(self, ch);
                 } else {
                     insert::handle(self, ch);

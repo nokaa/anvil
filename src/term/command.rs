@@ -5,42 +5,18 @@
  * The license may also be found at https://gnu.org/licenses/agpl.txt
  */
 
-use super::{Term, cursor};
-use rustty::{Event};
+use super::{Term};
+use editor::EditorMode;
 
 pub fn handle(term: &mut Term, ch: char) {
     match ch {
-        'i' => {
-            term.editor.switch_mode();
-        }
-        'h' => {
-            term.move_cursor(cursor::Direction::Left);
-        }
-        'j' => {
-            term.move_cursor(cursor::Direction::Down);
-        }
-        'k' => {
-            term.move_cursor(cursor::Direction::Up);
-        }
-        'l' => {
-            term.move_cursor(cursor::Direction::Right);
-        }
-        'r' => {
-            let evt = term.term.get_event(-1).unwrap();
-            if let Some(Event::Key(ch)) = evt {
-                match ch {
-                    '\x1b' | '\x7f' => { }
-                    // TODO(nokaa): ENTER and TAB are ignored for now.
-                    '\r' | '\t' => { }
-                    c @ _ => {
-                        let pos = term.cursor.current_pos();
-                        term.term[pos].set_ch(c);
-                        term.editor.replace_char(pos, c);
-                    }
-                }
-            }
+        '\x1b' => { // Escape key
+            term.editor.switch_mode(EditorMode::Normal);
         }
         'w' => {
+            // TODO(nokaa): writing to file should display success/failure
+            // to user and not exit terminal. We can show this status
+            // in the line below the prompt.
             match term.editor.write_file() {
                 Ok(_) => { }
                 Err(e) => {

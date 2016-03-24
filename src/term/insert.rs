@@ -6,6 +6,7 @@
  */
 
 use super::Term;
+use editor::EditorMode;
 
 pub fn handle(term: &mut Term, ch: char) {
     match ch {
@@ -15,7 +16,7 @@ pub fn handle(term: &mut Term, ch: char) {
                 term.cursor.pos.x -= 1;
             }
 
-            term.editor.switch_mode();
+            term.editor.switch_mode(EditorMode::Normal);
         }
         '\x7f' => { // Backspace key
             let line = term.current_line() + term.cursor.pos.y;
@@ -61,7 +62,7 @@ pub fn handle(term: &mut Term, ch: char) {
             let line = term.current_line() + term.cursor.pos.y;
             let pos = term.cursor.pos.x;
 
-            for i in 0..4 {
+            for _ in 0..4 {
                 term.editor.contents[line].insert(pos, b' ');
             }
 
