@@ -18,6 +18,7 @@ Please see `Commands.md` for a list of commands and their functions.
 - More stable file writing implementation; e.g. writing to a temp file
 - More useful information in the prompt; e.g. current line number
 - Gutter with line numbers
+- `a` or append command
 
 ### Build
 To build forge, you must have the Rust compiler and Cargo installed on

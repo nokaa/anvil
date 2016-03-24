@@ -120,9 +120,9 @@ impl<'a> Term<'a> {
                 if b == b'\n' {
                     continue;
                 } else if j == w {
-                    self.partial_lines.push(i - start);
                     i += 1;
                     j = 0;
+                    self.partial_lines.push(i - start);
                 }
 
                 self.term[(j, i - start)].set_ch(b as char);
@@ -208,9 +208,15 @@ impl<'a> Term<'a> {
                 }
             }
             cursor::Direction::Left => {
+                let y = self.cursor.pos.y;
+
                 if self.cursor.pos.x != 0 {
                     self.cursor.save_pos();
                     self.cursor.pos.x -= 1;
+                } else if self.partial_lines.contains(&y) {
+                    self.cursor.save_pos();
+                    self.cursor.pos.y -= 1;
+                    self.cursor.pos.x = self.term.cols() - 1;
                 }
             }
             cursor::Direction::Right => {
