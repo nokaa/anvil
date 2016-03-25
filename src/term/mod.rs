@@ -167,7 +167,9 @@ impl<'a> Term<'a> {
                 }
             }
             cursor::Direction::Down => {
-                if self.cursor.pos.y < self.term.rows() - 3 {
+                if self.cursor.pos.y < self.term.rows() - 3 &&
+                   self.cursor.pos.y < self.editor.contents.len() - 1
+                {
                     let curr = self.current_line();
                     let len = self.editor.contents[curr].len() - 1;
                     
@@ -213,7 +215,7 @@ impl<'a> Term<'a> {
                 }
             }
             cursor::Direction::Right => {
-                let (x, y) = self.cursor.current_pos();
+                let x = self.cursor.pos.x;
                 let curr = self.current_line();
                 let len = self.editor.contents[curr].len() - 1;
 
@@ -224,7 +226,7 @@ impl<'a> Term<'a> {
                         self.cursor.in_line += 1;
                     } else {
                         self.cursor.save_pos();
-                        self.cursor.pos.x = 1;
+                        self.cursor.pos.x = 0;
                         self.cursor.pos.y += 1;
                         self.cursor.in_line += 1;
                     }
