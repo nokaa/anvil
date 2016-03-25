@@ -156,9 +156,13 @@ impl<'a> Term<'a> {
                     let curr = self.current_line() - 1;
                     self.set_current_line(curr);
                     
-                    let len = self.editor.contents[curr].len() - 2;
-                    if self.cursor.pos.x > len {
+                    let len = self.editor.contents[curr].len() - 1;
+                    if len == 0 && self.cursor.pos.x > len {
                         self.cursor.pos.x = len;
+                        self.cursor.in_line = len;
+                    } else if len > 0 && self.cursor.pos.x > len - 1 {
+                        self.cursor.pos.x = len - 1;
+                        self.cursor.in_line = len - 1;
                     }
                 }
             }
@@ -184,9 +188,13 @@ impl<'a> Term<'a> {
                     }
 
                     let curr = self.current_line();
-                    let len = self.editor.contents[curr].len() - 2;
-                    if self.cursor.pos.x > len {
+                    let len = self.editor.contents[curr].len() - 1;
+                    if len == 0 && self.cursor.pos.x > len {
                         self.cursor.pos.x = len;
+                        self.cursor.in_line = len;
+                    } else if len > 0 && self.cursor.pos.x > len - 1 {
+                        self.cursor.pos.x = len - 1;
+                        self.cursor.in_line = len - 1;
                     }
                 }
             }
@@ -207,9 +215,9 @@ impl<'a> Term<'a> {
             cursor::Direction::Right => {
                 let (x, y) = self.cursor.current_pos();
                 let curr = self.current_line();
-                let len = self.editor.contents[curr].len();
+                let len = self.editor.contents[curr].len() - 1;
 
-                if self.cursor.in_line < len - 2 {
+                if len > 0 && self.cursor.in_line < len - 1 {
                     if x < self.term.cols() - 1 {
                         self.cursor.save_pos();
                         self.cursor.pos.x += 1;
