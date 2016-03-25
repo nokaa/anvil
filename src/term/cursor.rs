@@ -27,6 +27,7 @@ pub struct Cursor {
     pub pos: Position,
     pub lpos: Position,
     pub color: rustty::Color,
+    pub in_line: usize,
 }
 
 impl Cursor {
@@ -36,6 +37,7 @@ impl Cursor {
             pos: Position {x: 0, y: 0},
             lpos: Position {x: 0, y: 0},
             color: color,
+            in_line: 0,
         }
     }
 

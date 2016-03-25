@@ -145,64 +145,47 @@ impl<'a> Term<'a> {
     pub fn move_cursor(&mut self, direction: cursor::Direction) {
         match direction {
             cursor::Direction::Up => {
-                let mut y = self.cursor.pos.y;
-
-                if y != 0 {
+                if self.cursor.pos.y > 0 {
                     self.cursor.save_pos();
-                    while self.partial_lines.contains(&y) {
-                        if y == 1 {
-                            break;
-                        }
-                        y -= 1;
+                    let mut i = self.cursor.pos.y - 1;
+                    while self.partial_lines.contains(&i) {
+                        self.cursor.pos.y -= 1;
+                        i -= 1;
                     }
-                    self.cursor.pos.y = y - 1;
-                } else if self.current_line() != 0 {
-                    let current_line = self.current_line();
-                    self.set_current_line(current_line - 1);
-                    self.redraw_file();
-                }
-                let curr = self.cursor.pos.y + self.current_line();
-                let len = self.editor.contents[curr].len() - 1;
-                if self.cursor.pos.x > len {
-                    if self.editor.contents[curr][len] == b'\n' && len > 0{
-                        self.cursor.pos.x = len - 1;
-                    } else {
+                    self.cursor.pos.y -= 1;
+                    let curr = self.current_line() - 1;
+                    self.set_current_line(curr);
+                    
+                    let len = self.editor.contents[curr].len() - 2;
+                    if self.cursor.pos.x > len {
                         self.cursor.pos.x = len;
                     }
                 }
             }
             cursor::Direction::Down => {
-                let curr = self.current_line();
-                let w = self.term.cols();
-
-                if self.total_lines() <= self.term.rows() - 3 {
-                    if self.editor.contents[curr].len() > w {
-
-                    }
-                    if self.cursor.pos.y != self.term.rows() - 3 &&
-                       self.cursor.pos.y < self.total_lines() - 1
-                    {
-                        self.cursor.save_pos();
-                        self.cursor.pos.y += 1;
-                    }
-                } else {
-                    if self.cursor.pos.y != self.term.rows() - 3 {
-                        self.cursor.save_pos();
-                        self.cursor.pos.y += 1;
-                    } else if self.cursor.pos.y + self.current_line() <
-                              self.total_lines() - 1
-                    {
-                        let current_line = self.current_line();
-                        self.set_current_line(current_line + 1);
-                        self.redraw_file();
-                    }
-                }
-                let curr = self.cursor.pos.y + self.current_line();
-                let len = self.editor.contents[curr].len() - 1;
-                if self.cursor.pos.x > len {
-                    if self.editor.contents[curr][len] == b'\n' && len > 0{
-                        self.cursor.pos.x = len - 1;
+                if self.cursor.pos.y < self.term.rows() - 3 {
+                    let curr = self.current_line();
+                    let len = self.editor.contents[curr].len() - 1;
+                    
+                    self.cursor.save_pos();
+                    self.set_current_line(curr + 1);
+                    
+                    if len > self.term.cols() {
+                        let mut adv = len / self.term.cols();
+                        if len % self.term.cols() > 0 {
+                            adv += 1;
+                        }
+                        if self.partial_lines.contains(&self.cursor.pos.y) {
+                            adv -= 1;
+                        }
+                        self.cursor.pos.y += adv;
                     } else {
+                        self.cursor.pos.y += 1;
+                    }
+
+                    let curr = self.current_line();
+                    let len = self.editor.contents[curr].len() - 2;
+                    if self.cursor.pos.x > len {
                         self.cursor.pos.x = len;
                     }
                 }
@@ -213,30 +196,30 @@ impl<'a> Term<'a> {
                 if self.cursor.pos.x != 0 {
                     self.cursor.save_pos();
                     self.cursor.pos.x -= 1;
+                    self.cursor.in_line -= 1;
                 } else if self.partial_lines.contains(&y) {
                     self.cursor.save_pos();
                     self.cursor.pos.y -= 1;
                     self.cursor.pos.x = self.term.cols() - 1;
+                    self.cursor.in_line -= 1;
                 }
             }
             cursor::Direction::Right => {
-                let partials = self.partial_lines.len();
                 let (x, y) = self.cursor.current_pos();
-                let curr = self.current_line() + y;// - partials;
-                let len = self.editor.contents[curr].len() - 2;
+                let curr = self.current_line();
+                let len = self.editor.contents[curr].len();
 
-                if len + 1 > self.term.cols() - 1 {
-
-                }
-                if x < len && x < self.term.cols() - 1 {
-                    self.cursor.save_pos();
-                    self.cursor.pos.x += 1;
-                } else if x < len && self.partial_lines.contains(&(y + 1)) {
-                    self.cursor.save_pos();
-                    self.cursor.pos.x = 0;
-                    self.cursor.pos.y += 1;
-                }
-                if self.partial_lines.contains(&(y+1)) {
+                if self.cursor.in_line < len - 2 {
+                    if x < self.term.cols() - 1 {
+                        self.cursor.save_pos();
+                        self.cursor.pos.x += 1;
+                        self.cursor.in_line += 1;
+                    } else {
+                        self.cursor.save_pos();
+                        self.cursor.pos.x = 1;
+                        self.cursor.pos.y += 1;
+                        self.cursor.in_line += 1;
+                    }
                 }
             }
         }
