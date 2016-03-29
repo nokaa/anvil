@@ -9,6 +9,6 @@ license = "AGPL"
 keywords = ["text", "editor", "text-editor", "forge"]
 
 [dependencies]
-clap = "2.1.2"
+clap = "2.2.2"
 fe-rustty = { git = "https://github.com/Syntaf/fe-rustty.git" }
 rust-crypto = "^0.2"
