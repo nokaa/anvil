@@ -147,7 +147,12 @@ impl<'a> Term<'a> {
             cursor::Direction::Up => {
                 if self.cursor.pos.y > 0 {
                     self.cursor.save_pos();
-                    let mut i = self.cursor.pos.y - 1;
+                    let mut i = self.cursor.pos.y;// - 1;
+                    if self.partial_lines.contains(&i) {
+                        self.cursor.pos.y -= 1;
+                    }
+                    i -= 1;
+
                     while self.partial_lines.contains(&i) {
                         self.cursor.pos.y -= 1;
                         i -= 1;
