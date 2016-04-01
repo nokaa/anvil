@@ -25,8 +25,10 @@ pub struct Term<'a> {
     term: rustty::Terminal,
     /// Represents the running status
     quit: bool,
-    /// Represents the topmost line of the file we are editing in our UI
+    /// Represents the line in the file that we are currently editing
     line: usize,
+    /// Represents the line at the top of the UI
+    top_line: usize,
     /// Represents the total number of lines in the currently
     /// open file
     total_lines: usize,
@@ -42,6 +44,7 @@ impl<'a> Term<'a> {
             term: rustty::Terminal::new().unwrap(),
             quit: false,
             line: 0,
+            top_line: 0,
             total_lines: 0,
             partial_lines: vec![],
         }
@@ -141,11 +144,62 @@ impl<'a> Term<'a> {
         }
     }
 
+    /// Prints our editor's contents to the UI from the bottom up
+    fn print_file_bottom(&mut self, bottom: usize) {
+        self.partial_lines = vec![];
+        let w = self.term.cols();
+        let mut h = self.term.rows() - 3;
+        let mut i = 0;
+        let mut k = 0;
+        let mut j = 0;
+
+        loop {
+            let line = &self.editor.contents[bottom - k];
+            let len = line.len();
+            let mut adv = len / w;
+            if len > w && len % w > 0 {
+                adv += 1;
+            }
+            i = adv;
+            for &b in line {
+                if b == b'\n' {
+                    //continue;
+                    break;
+                }
+                // TODO(nokaa): Handle cases where h - adv < 0
+                self.term[(j, h - adv)].set_ch(b as char);
+                j += 1;
+                if j == w {
+                    if adv == 0 {
+                        break;
+                    }
+
+                    j = 0;
+                    adv -= 1;
+                }
+            }
+            while j < w {
+                self.term[(j, h - adv)].set_ch(' ');
+                j += 1;
+            }
+
+            if h == 0 {
+                break;
+            }
+            h -= i;
+            h -= 1;
+            k += 1;
+            j = 0;
+        }
+    }
+
     /// Handles moving the cursor
     pub fn move_cursor(&mut self, direction: cursor::Direction) {
         match direction {
             cursor::Direction::Up => {
-                if self.cursor.pos.y > 0 {
+                let curr = self.current_line();
+
+                if self.cursor.pos.y > 0 && curr > 0 {
                     self.cursor.save_pos();
                     let mut i = self.cursor.pos.y;// - 1;
                     if self.partial_lines.contains(&i) {
@@ -158,10 +212,9 @@ impl<'a> Term<'a> {
                         i -= 1;
                     }
                     self.cursor.pos.y -= 1;
-                    let curr = self.current_line() - 1;
-                    self.set_current_line(curr);
+                    self.set_current_line(curr - 1);
                     
-                    let len = self.editor.contents[curr].len() - 1;
+                    let len = self.editor.contents[curr - 1].len() - 1;
                     if len == 0 && self.cursor.pos.x > len {
                         self.cursor.pos.x = len;
                         self.cursor.in_line = len;
@@ -169,13 +222,17 @@ impl<'a> Term<'a> {
                         self.cursor.pos.x = len - 1;
                         self.cursor.in_line = len - 1;
                     }
+                } else if curr > 0 {
+                    self.set_current_line(curr - 1);
+                    self.redraw_file();
                 }
             }
             cursor::Direction::Down => {
+                let curr = self.current_line();
+
                 if self.cursor.pos.y < self.term.rows() - 3 &&
-                   self.cursor.pos.y < self.editor.contents.len() - 1
+                   curr < self.editor.contents.len() - 1
                 {
-                    let curr = self.current_line();
                     let len = self.editor.contents[curr].len() - 1;
                     
                     self.cursor.save_pos();
@@ -203,6 +260,22 @@ impl<'a> Term<'a> {
                         self.cursor.pos.x = len - 1;
                         self.cursor.in_line = len - 1;
                     }
+                } else if curr < self.editor.contents.len() - 1  {
+                    let len = self.editor.contents[curr + 1].len() - 1;
+                    self.cursor.save_pos();
+                    self.set_current_line(curr + 1);
+
+                    self.redraw_file_bottom();
+                    /*if len > self.term.cols() {
+                        let mut adv = len / self.term.cols();
+                        if len % self.term.cols() > 0 {
+                            adv += 1;
+                        }
+                        if self.partial_lines.contains(&self.cursor.pos.y) {
+                            adv -= 1;
+                        }
+                    } else {
+                    }*/
                 }
             }
             cursor::Direction::Left => {
@@ -271,8 +344,15 @@ impl<'a> Term<'a> {
     /// file contents. E.g. this is called when the current line
     /// changes.
     pub fn redraw_file(&mut self) {
-        let current_line = self.current_line();
+        self.top_line -= 1;
+        let current_line = self.top_line;
         self.print_file(current_line);
+    }
+
+    pub fn redraw_file_bottom(&mut self) {
+        self.top_line += 1;
+        let bottom = self.current_line();
+        self.print_file_bottom(bottom);
     }
 
     /// This function redraws the given line of the UI on the screen.
