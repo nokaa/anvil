@@ -1,0 +1,8 @@
+[package]
+name = "rpc"
+version = "0.1.0"
+authors = ["nokaa <nokaa@cock.li>"]
+build = "build.rs"
+
+[build-dependencies]
+capnpc = "0.7.5"

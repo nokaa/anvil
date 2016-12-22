@@ -1,6 +1,7 @@
 [package]
 authors = ["nokaa <nokaa@cock.li>"]
-name = "forge"
+name = "cli-client"
 version = "0.1.0"
 
 [dependencies]
+clap = "2.19.2"

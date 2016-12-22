@@ -1,34 +1,13 @@
-# Forge [![Build Status](https://travis-ci.org/nokaa/forge.svg?branch=master)](https://travis-ci.org/nokaa/forge)
-Forge is my experiment with text editors. I wanted to see what makes a
-text editor a text editor.
+# Forge
 
-At this time, Forge is shaping up to be a basic Vi clone. It currently
-has a very basic command and normal modes; and an insert mode. We are able
-to display file contents in a user interface, and we also have a basic
-prompt which shows the filename.
+Forge is an experimental text editor that borrows ideas from Vim and Emacs.
 
-We can now open and view files. We are able to modify files in insert
-mode and command mode, and write these changes to disk.
+Forge intends to be as fast as possible while staying as small as possible.
+It should be easy to read through the source and directly modify Forge.
 
-Please see `Commands.md` for a list of commands and their functions.
+Forge aims to have a plugin system as powerful as Emacs'. This should make
+almost anything possible. Forge also aims to have a better plugin language
+than VimLang.
 
-### Coming Soon (TM)
-- Handling of terminal resizing
-- Completing the replace command implementation
-- More stable file writing implementation; e.g. writing to a temp file
-- More useful information in the prompt; e.g. current line number
-- Gutter with line numbers
-- `a` or append command
-
-### Build
-To build forge, you must have the Rust compiler and Cargo installed on
-your system. Forge is tested on the current stable, beta, and nightly
-compilers. Forge is currently only tested on Linux. Forge does not build
-on OSX due to an issue with rustty, and build status on Windows is unknown.
-
-```
-git clone http://github.com/nokaa/forge
-cd forge
-cargo build
-cargo run src/main.rs
-```
+Forge plans to have a dank-ass UI based on the good old TTY, but with some
+[special sauce](https://github.com/withoutboats/notty) thrown in to make it even danker.
