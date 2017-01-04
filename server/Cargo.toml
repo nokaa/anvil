@@ -1,15 +1,8 @@
 [package]
 authors = ["nokaa <nokaa@cock.li>"]
-name = "server"
+name = "anvil-server"
 version = "0.1.0"
 
 [dependencies]
-capnp = "0.7.5"
-capnp-rpc = "0.7.4"
 clap = "2.19.2"
-gj = "0.2.0"
-gjio = "0.1.3"
 xi_rope = "0.1.0"
-
-[dependencies.rpc]
-path = "../rpc"
