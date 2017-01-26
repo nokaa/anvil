@@ -11,7 +11,6 @@ use std::path::Path;
 pub struct Command {
     core: Core,
     editor: editor::Client<::capnp::text::Owned>,
-    rpc_system: RpcSystem<rpc_twoparty_capnp::Side>,
 }
 
 impl Command {
@@ -33,10 +32,11 @@ impl Command {
         let editor: editor::Client<::capnp::text::Owned> =
             rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
 
+        handle.spawn(rpc_system.map_err(|_e| ()));
+
         Ok(Command {
             core: core,
             editor: editor,
-            rpc_system: rpc_system,
         })
     }
 
@@ -47,7 +47,7 @@ impl Command {
         request.get().set_string(text);
 
         self.core
-            .run(self.rpc_system.join(request.send().promise))
+            .run(request.send().promise)
             .chain_err(|| "unable to run event loop")?;
         Ok(())
     }
