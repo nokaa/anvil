@@ -23,10 +23,10 @@ impl EditorImpl {
     }
 }
 
-impl editor::Server<::capnp::text::Owned> for EditorImpl {
+impl editor::Server for EditorImpl {
     fn insert(&mut self,
-              params: editor::InsertParams<::capnp::text::Owned>,
-              _results: editor::InsertResults<::capnp::text::Owned>)
+              params: editor::InsertParams,
+              _results: editor::InsertResults)
               -> Promise<(), ::capnp::Error> {
         let line = pry!(params.get()).get_line();
         let column = pry!(params.get()).get_column();
@@ -41,8 +41,8 @@ impl editor::Server<::capnp::text::Owned> for EditorImpl {
     }
 
     fn write_file(&mut self,
-                  params: editor::WriteFileParams<::capnp::text::Owned>,
-                  _results: editor::WriteFileResults<::capnp::text::Owned>)
+                  params: editor::WriteFileParams,
+                  _results: editor::WriteFileResults)
                   -> Promise<(), ::capnp::Error> {
         let file_name = pry!(pry!(params.get()).get_path());
         let mut file = File::create(file_name).unwrap();
@@ -51,6 +51,13 @@ impl editor::Server<::capnp::text::Owned> for EditorImpl {
             file.write_all(line.as_bytes()).unwrap();
         }
 
+        Promise::ok(())
+    }
+
+    fn quit(&mut self,
+            _params: editor::QuitParams,
+            _results: editor::QuitResults)
+            -> Promise<(), ::capnp::Error> {
         Promise::ok(())
     }
 }
@@ -63,9 +70,9 @@ pub fn server<P>(path: P) -> Result<()>
 
     let socket = UnixListener::bind(path, &handle).chain_err(|| "unable to bind to UDS")?;
 
-    let publisher_impl = EditorImpl::new();
+    let editor_impl = EditorImpl::new();
 
-    let publisher = editor::ToClient::new(publisher_impl).from_server::<::capnp_rpc::Server>();
+    let editor = editor::ToClient::new(editor_impl).from_server::<::capnp_rpc::Server>();
 
     let handle1 = handle.clone();
     let done = socket.incoming()
@@ -78,7 +85,7 @@ pub fn server<P>(path: P) -> Result<()>
                                                     rpc_twoparty_capnp::Side::Server,
                                                     Default::default());
 
-            let rpc_system = RpcSystem::new(Box::new(network), Some(publisher.clone().client));
+            let rpc_system = RpcSystem::new(Box::new(network), Some(editor.clone().client));
 
             handle.spawn(rpc_system.map_err(|_| ()));
             Ok(())
