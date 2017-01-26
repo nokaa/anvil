@@ -11,13 +11,10 @@ extern crate tokio_core;
 extern crate tokio_uds;
 extern crate xi_rope;
 
-mod error;
-mod client;
 mod server;
 
+pub mod error;
 pub mod rpc_capnp {
     include!(concat!(env!("OUT_DIR"), "/rpc_capnp.rs"));
 }
-
-pub use client::client;
 pub use server::server;

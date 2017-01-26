@@ -1,6 +1,17 @@
-use error::*;
-use rpc_capnp::{editor, plugin};
+#![recursion_limit = "1024"]
 
+extern crate anvil_server;
+#[macro_use]
+extern crate error_chain;
+extern crate capnp;
+#[macro_use]
+extern crate capnp_rpc;
+extern crate futures;
+extern crate tokio_core;
+extern crate tokio_uds;
+
+use anvil_server::error::*;
+use anvil_server::rpc_capnp::{editor, plugin};
 use capnp::capability::Promise;
 use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
 use futures::Future;
@@ -23,7 +34,7 @@ impl plugin::Server<::capnp::text::Owned> for PluginImpl {
     }
 }
 
-pub fn client<P>(path: P) -> Result<()>
+fn client<P>(path: P) -> Result<()>
     where P: AsRef<Path>
 {
     let mut core = Core::new().chain_err(|| "unable to create event loop")?;
@@ -55,4 +66,8 @@ pub fn client<P>(path: P) -> Result<()>
     let _result = core.run(rpc_system.join(request.send().promise))
         .chain_err(|| "unable to run event loop")?;
     Ok(())
+}
+
+fn main() {
+    client("../server/test");
 }
