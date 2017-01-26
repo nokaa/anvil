@@ -126,7 +126,7 @@ pub fn server<P>(path: P) -> Result<()>
     where P: AsRef<Path>
 {
     // Unlink the UDS if it already exists.
-    unistd::unlink(path.as_ref())?;
+    // unistd::unlink(path.as_ref())?;
 
     let mut core = Core::new().chain_err(|| "unable to create event loop")?;
     let handle = core.handle();

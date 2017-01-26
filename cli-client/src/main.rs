@@ -85,6 +85,6 @@ fn main() {
             .required(false))
         .get_matches();
 
-    let path = matches.value_of("path").unwrap_or("../server/test");
+    let path = matches.value_of("path").unwrap_or("\0anvil_uds");
     client(path).unwrap();
 }
