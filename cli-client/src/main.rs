@@ -1,19 +1,22 @@
 #![recursion_limit = "1024"]
 
+extern crate anvil_rpc;
 extern crate anvil_server;
-#[macro_use]
-extern crate error_chain;
 extern crate capnp;
 #[macro_use]
 extern crate capnp_rpc;
+extern crate clap;
+#[macro_use]
+extern crate error_chain;
 extern crate futures;
 extern crate tokio_core;
 extern crate tokio_uds;
 
 use anvil_server::error::*;
-use anvil_server::rpc_capnp::{editor, plugin};
+use anvil_rpc::{editor, plugin};
 use capnp::capability::Promise;
 use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
+use clap::{Arg, App, SubCommand};
 use futures::Future;
 use tokio_core::reactor::Core;
 use tokio_core::io::Io;
@@ -69,5 +72,19 @@ fn client<P>(path: P) -> Result<()>
 }
 
 fn main() {
-    client("../server/test");
+    let matches = App::new("anvil-cli-client")
+        .version("0.1")
+        .author("nokaa <nokaa@cock.li>")
+        .about("A CLI client for making RPC calls on an Anvil server")
+        .arg(Arg::with_name("path")
+            .short("p")
+            .long("path")
+            .value_name("PATH")
+            .help("Sets path of the UDS used by the server")
+            .takes_value(true)
+            .required(false))
+        .get_matches();
+
+    let path = matches.value_of("path").unwrap_or("../server/test");
+    client(path).unwrap();
 }

@@ -1,6 +1,7 @@
 #![feature(insert_str)]
 #![recursion_limit = "1024"]
 
+extern crate anvil_rpc;
 #[macro_use]
 extern crate error_chain;
 extern crate capnp;
@@ -14,7 +15,4 @@ extern crate xi_rope;
 mod server;
 
 pub mod error;
-pub mod rpc_capnp {
-    include!(concat!(env!("OUT_DIR"), "/rpc_capnp.rs"));
-}
 pub use server::server;

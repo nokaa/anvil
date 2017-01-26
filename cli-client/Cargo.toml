@@ -1,16 +1,19 @@
 [package]
 authors = ["nokaa <nokaa@cock.li>"]
-name = "cli-client"
+name = "anvil-cli-client"
 version = "0.1.0"
 
 [dependencies]
 capnp = "0.8.0"
 capnp-rpc = "0.8.1"
-clap = "2.19.2"
+clap = "2.20.0"
 error-chain = "0.8.1"
 futures = "0.1.9"
 tokio-core = "0.1.4"
 tokio-uds = "0.1.1"
+
+[dependencies.anvil-rpc]
+path = "../rpc"
 
 [dependencies.anvil-server]
 path = "../server"

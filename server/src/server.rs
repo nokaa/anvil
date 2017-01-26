@@ -1,5 +1,5 @@
 use error::*;
-use rpc_capnp::{editor, plugin, subscription};
+use anvil_rpc::{editor, plugin, subscription};
 
 use capnp::capability::Promise;
 use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};

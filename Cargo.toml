@@ -1,6 +1,6 @@
 [package]
 authors = ["nokaa <nokaa@cock.li>"]
-name = "Anvil"
+name = "anvil"
 version = "0.1.0"
 
 [dependencies]

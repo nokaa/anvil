@@ -1,11 +1,7 @@
 [package]
 authors = ["nokaa <nokaa@cock.li>"]
-build = "build.rs"
 name = "anvil-server"
 version = "0.1.0"
-
-[build-dependencies]
-capnpc = "0.8.1"
 
 [dependencies]
 capnp = "0.8.0"
@@ -16,3 +12,6 @@ futures = "0.1.9"
 tokio-core = "0.1.4"
 tokio-uds = "0.1.1"
 xi-rope = "0.1.0"
+
+[dependencies.anvil-rpc]
+path = "../rpc"
