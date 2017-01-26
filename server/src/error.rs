@@ -1,10 +1,12 @@
 use capnp;
+use nix;
 
 use std::io;
 
 error_chain!{
     foreign_links {
-        Io(io::Error);
         Capnp(capnp::Error);
+        Io(io::Error);
+        Nix(nix::Error);
     }
 }
