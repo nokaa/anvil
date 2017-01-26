@@ -51,4 +51,14 @@ impl Command {
             .chain_err(|| "unable to run event loop")?;
         Ok(())
     }
+
+    pub fn write_file(mut self, file_name: &str) -> Result<()> {
+        let mut request = self.editor.write_file_request();
+        request.get().set_path(file_name);
+
+        self.core
+            .run(request.send().promise)
+            .chain_err(|| "unable to run event loop")?;
+        Ok(())
+    }
 }

@@ -9,6 +9,8 @@ use tokio_core::reactor::Core;
 use tokio_uds::UnixListener;
 // use xi_rope::Rope;
 
+use std::fs::File;
+use std::io::Write;
 use std::path::Path;
 
 struct EditorImpl {
@@ -39,9 +41,16 @@ impl editor::Server<::capnp::text::Owned> for EditorImpl {
     }
 
     fn write_file(&mut self,
-                  _params: editor::WriteFileParams<::capnp::text::Owned>,
+                  params: editor::WriteFileParams<::capnp::text::Owned>,
                   _results: editor::WriteFileResults<::capnp::text::Owned>)
                   -> Promise<(), ::capnp::Error> {
+        let file_name = pry!(pry!(params.get()).get_path());
+        let mut file = File::create(file_name).unwrap();
+
+        for line in &self.content {
+            file.write_all(line.as_bytes()).unwrap();
+        }
+
         Promise::ok(())
     }
 }

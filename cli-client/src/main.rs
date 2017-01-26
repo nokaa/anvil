@@ -44,9 +44,16 @@ fn main() {
                 .help("The text to be inserted")
                 .required(true)
                 .index(3)))
+        .subcommand(SubCommand::with_name("writeFile")
+            .about("Save editor contents to FILENAME")
+            .arg(Arg::with_name("FILENAME")
+                .help("The filename to write editor contents to")
+                .required(true)
+                .index(1)))
         .get_matches();
 
     let path = matches.value_of("path").unwrap_or("\0anvil_uds");
+
     if let Some(matches) = matches.subcommand_matches("insert") {
         let text = matches.value_of("TEXT").unwrap();
         let line = matches.value_of("LINE").unwrap();
@@ -56,5 +63,9 @@ fn main() {
 
         let cmd = commands::Command::new(path).unwrap();
         cmd.insert(line, column, text).unwrap();
+    } else if let Some(matches) = matches.subcommand_matches("writeFile") {
+        let file_name = matches.value_of("FILENAME").unwrap();
+        let cmd = commands::Command::new(path).unwrap();
+        cmd.write_file(file_name).unwrap();
     }
 }
