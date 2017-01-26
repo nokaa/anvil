@@ -4,7 +4,6 @@ use anvil_rpc::{editor, plugin, subscription};
 use capnp::capability::Promise;
 use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
 use futures::{Future, Stream};
-use nix::unistd;
 use tokio_core::io::Io;
 use tokio_core::reactor::{self, Core};
 use tokio_uds::UnixListener;
@@ -125,9 +124,6 @@ impl editor::Server<::capnp::text::Owned> for EditorImpl {
 pub fn server<P>(path: P) -> Result<()>
     where P: AsRef<Path>
 {
-    // Unlink the UDS if it already exists.
-    // unistd::unlink(path.as_ref())?;
-
     let mut core = Core::new().chain_err(|| "unable to create event loop")?;
     let handle = core.handle();
 

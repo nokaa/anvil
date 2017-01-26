@@ -8,7 +8,6 @@ extern crate capnp;
 #[macro_use]
 extern crate capnp_rpc;
 extern crate futures;
-extern crate nix;
 extern crate tokio_core;
 extern crate tokio_uds;
 extern crate xi_rope;
