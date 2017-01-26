@@ -1,7 +1,6 @@
 #![recursion_limit = "1024"]
 
 extern crate anvil_rpc;
-extern crate anvil_server;
 extern crate capnp;
 #[macro_use]
 extern crate capnp_rpc;
@@ -13,6 +12,7 @@ extern crate tokio_core;
 extern crate tokio_uds;
 
 mod commands;
+mod error;
 
 use clap::{Arg, App, SubCommand};
 

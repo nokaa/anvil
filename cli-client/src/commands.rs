@@ -1,4 +1,5 @@
-use anvil_server::error::*;
+use error::*;
+
 use anvil_rpc::editor;
 use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
 use futures::Future;

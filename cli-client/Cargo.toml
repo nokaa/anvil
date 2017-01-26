@@ -14,6 +14,3 @@ tokio-uds = "0.1.1"
 
 [dependencies.anvil-rpc]
 path = "../rpc"
-
-[dependencies.anvil-server]
-path = "../server"
