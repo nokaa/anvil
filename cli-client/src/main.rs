@@ -12,64 +12,11 @@ extern crate futures;
 extern crate tokio_core;
 extern crate tokio_uds;
 
-use anvil_server::error::*;
-use anvil_rpc::{editor, plugin};
-use capnp::capability::Promise;
-use capnp_rpc::{RpcSystem, twoparty, rpc_twoparty_capnp};
+mod commands;
+
 use clap::{Arg, App, SubCommand};
-use futures::Future;
-use tokio_core::reactor::Core;
-use tokio_core::io::Io;
-use tokio_uds::UnixStream;
 
-use std::path::Path;
-
-struct PluginImpl;
-
-impl plugin::Server<::capnp::text::Owned> for PluginImpl {
-    fn push_message(&mut self,
-                    params: plugin::PushMessageParams<::capnp::text::Owned>,
-                    _results: plugin::PushMessageResults<::capnp::text::Owned>)
-                    -> Promise<(), ::capnp::Error> {
-        println!("message from publisher: {}",
-                 pry!(pry!(params.get()).get_message()));
-        Promise::ok(())
-    }
-}
-
-fn client<P>(path: P) -> Result<()>
-    where P: AsRef<Path>
-{
-    let mut core = Core::new().chain_err(|| "unable to create event loop")?;
-    let handle = core.handle();
-
-    let stream = UnixStream::connect(path, &handle).chain_err(|| "unable to connect to UDS")?;
-    let (reader, writer) = stream.split();
-
-    let rpc_network = Box::new(twoparty::VatNetwork::new(reader,
-                                                         writer,
-                                                         rpc_twoparty_capnp::Side::Client,
-                                                         Default::default()));
-
-    let mut rpc_system = RpcSystem::new(rpc_network, None);
-    let editor: editor::Client<::capnp::text::Owned> =
-        rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
-
-    // let sub = plugin::ToClient::new(PluginImpl).from_server::<::capnp_rpc::Server>();
-
-    // let mut request = editor.subscribe_request();
-    // request.get().set_plugin(sub);
-
-    let mut request = editor.insert_request();
-    request.get().set_line(0);
-    request.get().set_column(0);
-    request.get().set_string("some string");
-
-    // Need to make sure not to drop the returned subscription object.
-    let _result = core.run(rpc_system.join(request.send().promise))
-        .chain_err(|| "unable to run event loop")?;
-    Ok(())
-}
+use std::u64;
 
 fn main() {
     let matches = App::new("anvil-cli-client")
@@ -83,8 +30,31 @@ fn main() {
             .help("Sets path of the UDS used by the server")
             .takes_value(true)
             .required(false))
+        .subcommand(SubCommand::with_name("insert")
+            .about("Insert <TEXT> at [LINE][COLUMN]")
+            .arg(Arg::with_name("LINE")
+                .help("The line number to insert at. Lines start at 0.")
+                .required(true)
+                .index(1))
+            .arg(Arg::with_name("COLUMN")
+                .help("The column to insert at. Columns start at 0.")
+                .required(true)
+                .index(2))
+            .arg(Arg::with_name("TEXT")
+                .help("The text to be inserted")
+                .required(true)
+                .index(3)))
         .get_matches();
 
     let path = matches.value_of("path").unwrap_or("\0anvil_uds");
-    client(path).unwrap();
+    if let Some(matches) = matches.subcommand_matches("insert") {
+        let text = matches.value_of("TEXT").unwrap();
+        let line = matches.value_of("LINE").unwrap();
+        let column = matches.value_of("COLUMN").unwrap();
+        let line = u64::from_str_radix(line, 10).unwrap();
+        let column = u64::from_str_radix(column, 10).unwrap();
+
+        let cmd = commands::Command::new(path).unwrap();
+        cmd.insert(line, column, text).unwrap();
+    }
 }
