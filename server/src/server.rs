@@ -9,8 +9,8 @@ use tokio_core::reactor::Core;
 use tokio_uds::UnixListener;
 // use xi_rope::Rope;
 
-use std::fs::File;
-use std::io::Write;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 use std::path::Path;
 
 struct EditorImpl {
@@ -24,19 +24,28 @@ impl EditorImpl {
 }
 
 impl editor::Server for EditorImpl {
-    fn insert(&mut self,
-              params: editor::InsertParams,
-              _results: editor::InsertResults)
-              -> Promise<(), ::capnp::Error> {
-        let line = pry!(params.get()).get_line();
-        let column = pry!(params.get()).get_column();
-        let text = pry!(pry!(params.get()).get_string());
+    fn open_file(&mut self,
+                 params: editor::OpenFileParams,
+                 _results: editor::OpenFileResults)
+                 -> Promise<(), ::capnp::Error> {
+        let file_name = pry!(pry!(params.get()).get_path());
+        let mut file = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .open(file_name)
+            .unwrap();
 
-        {
-            let mut line = &mut self.content[line as usize];
-            line.insert_str(column as usize, text);
+        let mut buf = String::new();
+        file.read_to_string(&mut buf).unwrap();
+
+        let mut contents = Vec::new();
+        for line in buf.lines() {
+            contents.push(line.to_string());
         }
-        println!("{:?}", self.content);
+
+        self.content = contents;
+
         Promise::ok(())
     }
 
@@ -51,6 +60,51 @@ impl editor::Server for EditorImpl {
             file.write_all(line.as_bytes()).unwrap();
         }
 
+        Promise::ok(())
+    }
+
+    fn insert(&mut self,
+              params: editor::InsertParams,
+              _results: editor::InsertResults)
+              -> Promise<(), ::capnp::Error> {
+        let mut line_number = pry!(params.get()).get_line() as usize;
+        let column = pry!(params.get()).get_column() as usize;
+        let text = pry!(pry!(params.get()).get_string());
+
+        {
+            let mut line = &mut self.content[line_number];
+            for (i, c) in text.char_indices() {
+                match c {
+                    '\n' => {
+                        // TODO: handle new lines in input
+                    }
+                    _ => {
+                        line.insert(column + i, c);
+                    }
+                }
+            }
+        }
+        println!("{:?}", self.content);
+        Promise::ok(())
+    }
+
+    fn delete(&mut self,
+              params: editor::DeleteParams,
+              _results: editor::DeleteResults)
+              -> Promise<(), ::capnp::Error> {
+        let line = pry!(params.get()).get_line();
+        let column = pry!(params.get()).get_column() as usize;
+        let length = pry!(params.get()).get_length() as usize;
+
+        {
+            let mut line = &mut self.content[line as usize];
+            // TODO: handle cases where column + length > line.len().
+            // We want to move onto the next line and continue removing elements.
+            for i in 0..length {
+                line.remove(column + i);
+            }
+        }
+        println!("{:?}", self.content);
         Promise::ok(())
     }
 
