@@ -112,6 +112,7 @@ impl editor::Server for EditorImpl {
             _params: editor::QuitParams,
             _results: editor::QuitResults)
             -> Promise<(), ::capnp::Error> {
+        println!("Quit request");
         Promise::ok(())
     }
 }

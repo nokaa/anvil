@@ -11,7 +11,7 @@ use std::path::Path;
 
 pub struct Command {
     core: Core,
-    editor: editor::Client<::capnp::text::Owned>,
+    editor: editor::Client,
 }
 
 impl Command {
@@ -30,8 +30,7 @@ impl Command {
                                                              Default::default()));
 
         let mut rpc_system = RpcSystem::new(rpc_network, None);
-        let editor: editor::Client<::capnp::text::Owned> =
-            rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
+        let editor: editor::Client = rpc_system.bootstrap(rpc_twoparty_capnp::Side::Server);
 
         handle.spawn(rpc_system.map_err(|_e| ()));
 
@@ -39,6 +38,26 @@ impl Command {
             core: core,
             editor: editor,
         })
+    }
+
+    pub fn open_file(mut self, file_name: &str) -> Result<()> {
+        let mut request = self.editor.open_file_request();
+        request.get().set_path(file_name);
+
+        self.core
+            .run(request.send().promise)
+            .chain_err(|| "unable to run event loop")?;
+        Ok(())
+    }
+
+    pub fn write_file(mut self, file_name: &str) -> Result<()> {
+        let mut request = self.editor.write_file_request();
+        request.get().set_path(file_name);
+
+        self.core
+            .run(request.send().promise)
+            .chain_err(|| "unable to run event loop")?;
+        Ok(())
     }
 
     pub fn insert(mut self, line: u64, column: u64, text: &str) -> Result<()> {
@@ -53,9 +72,20 @@ impl Command {
         Ok(())
     }
 
-    pub fn write_file(mut self, file_name: &str) -> Result<()> {
-        let mut request = self.editor.write_file_request();
-        request.get().set_path(file_name);
+    pub fn delete(mut self, line: u64, column: u64, length: u64) -> Result<()> {
+        let mut request = self.editor.delete_request();
+        request.get().set_line(line);
+        request.get().set_column(column);
+        request.get().set_length(length);
+
+        self.core
+            .run(request.send().promise)
+            .chain_err(|| "unable to run event loop")?;
+        Ok(())
+    }
+
+    pub fn quit(mut self) -> Result<()> {
+        let request = self.editor.quit_request();
 
         self.core
             .run(request.send().promise)

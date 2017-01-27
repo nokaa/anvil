@@ -1,4 +1,3 @@
-#![feature(insert_str)]
 #![recursion_limit = "1024"]
 
 extern crate anvil_rpc;
