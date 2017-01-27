@@ -3,12 +3,18 @@
 interface Editor {
     # An editor.
 
-    insert @0 (line: UInt64, column: UInt64, string: Text);
-    # Inserts `string` at [`line`][`column`] of the file.
+    openFile @0 (path: Text);
+    # Opens `path` for editing. If `path` does not exist, it is created.
 
     writeFile @1 (path: Text);
     # Writes the contents of this editor to the file specified by path.
 
-    quit @2 ();
+    insert @2 (line: UInt64, column: UInt64, string: Text);
+    # Inserts `string` at [`line`][`column`] of the file.
+
+    delete @3 (line: UInt64, column: UInt64, length: UInt64);
+    # Delete the string at [`line`][`column`] with `length`.
+
+    quit @4 ();
     # Quits this editor.
 }
