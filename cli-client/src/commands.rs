@@ -84,6 +84,33 @@ impl Command {
         Ok(())
     }
 
+    pub fn replace(mut self, line: u64, column: u64, length: u64, character: char) -> Result<()> {
+        let mut request = self.editor.delete_request();
+        request.get().set_line(line);
+        request.get().set_column(column);
+        request.get().set_length(length);
+
+        self.core
+            .run(request.send().promise)
+            .chain_err(|| "unable to run event loop")?;
+
+        let mut replacement = String::new();
+        for _ in 0..length {
+            replacement.push(character);
+        }
+
+        let mut request = self.editor.insert_request();
+        request.get().set_line(line);
+        request.get().set_column(column);
+        request.get().set_string(&replacement);
+
+        self.core
+            .run(request.send().promise)
+            .chain_err(|| "unable to run event loop")?;
+
+        Ok(())
+    }
+
     pub fn quit(mut self) -> Result<()> {
         let request = self.editor.quit_request();
 

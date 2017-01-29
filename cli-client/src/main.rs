@@ -70,6 +70,24 @@ fn main() {
                 .help("The number of characters to delete.")
                 .required(true)
                 .index(3)))
+        .subcommand(SubCommand::with_name("replace")
+            .about("replaces LENGTH characters with CHARACTER starting at [LINE][COLUMN]")
+            .arg(Arg::with_name("LINE")
+                .help("The line number to replace at. Lines start at 0.")
+                .required(true)
+                .index(1))
+            .arg(Arg::with_name("COLUMN")
+                .help("The column to replace at. Columns start at 0.")
+                .required(true)
+                .index(2))
+            .arg(Arg::with_name("LENGTH")
+                .help("The number of characters to replace.")
+                .required(true)
+                .index(3))
+            .arg(Arg::with_name("CHARACTER")
+                .help("The character to replace with.")
+                .required(true)
+                .index(4)))
         .subcommand(SubCommand::with_name("quit").about("Quits this editor"))
         .get_matches();
 
@@ -102,6 +120,23 @@ fn main() {
 
         let cmd = commands::Command::new(path).unwrap();
         cmd.delete(line, column, length).unwrap();
+    } else if let Some(matches) = matches.subcommand_matches("replace") {
+        let character = matches.value_of("CHARACTER").unwrap();
+        let line = matches.value_of("LINE").unwrap();
+        let column = matches.value_of("COLUMN").unwrap();
+        let length = matches.value_of("LENGTH").unwrap();
+        let line = u64::from_str_radix(line, 10).unwrap();
+        let column = u64::from_str_radix(column, 10).unwrap();
+        let length = u64::from_str_radix(length, 10).unwrap();
+
+        if character.len() > 1 {
+            panic!("CHARACTER must be a char, given {}", character);
+        }
+
+        let character = character.chars().nth(0).unwrap();
+
+        let cmd = commands::Command::new(path).unwrap();
+        cmd.replace(line, column, length, character).unwrap();
     } else if let Some(_matches) = matches.subcommand_matches("quit") {
         let cmd = commands::Command::new(path).unwrap();
         cmd.quit().unwrap();
