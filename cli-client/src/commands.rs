@@ -60,6 +60,19 @@ impl Command {
         Ok(())
     }
 
+    pub fn get(mut self, start: u64, end: u64) -> Result<()> {
+        let mut request = self.editor.get_request();
+        request.get().set_start_line(start);
+        request.get().set_end_line(end);
+
+        let response = self.core
+            .run(request.send().promise)
+            .chain_err(|| "unable to run event loop")?;
+        let lines = response.get()?.get_lines()?;
+        println!("{}", lines);
+        Ok(())
+    }
+
     pub fn insert(mut self, line: u64, column: u64, text: &str) -> Result<()> {
         let mut request = self.editor.insert_request();
         request.get().set_line(line);

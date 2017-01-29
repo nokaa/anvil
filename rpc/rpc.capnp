@@ -9,12 +9,15 @@ interface Editor {
     writeFile @1 (path: Text);
     # Writes the contents of this editor to the file specified by path.
 
-    insert @2 (line: UInt64, column: UInt64, string: Text);
+    get @2 (startLine: UInt64, endLine: UInt64) -> (lines: Text);
+    # Gets a range of lines.
+
+    insert @3 (line: UInt64, column: UInt64, string: Text);
     # Inserts `string` at [`line`][`column`] of the file.
 
-    delete @3 (line: UInt64, column: UInt64, length: UInt64);
+    delete @4 (line: UInt64, column: UInt64, length: UInt64);
     # Delete the string at [`line`][`column`] with `length`.
 
-    quit @4 ();
+    quit @5 ();
     # Quits this editor.
 }

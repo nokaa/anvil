@@ -57,6 +57,30 @@ impl editor::Server for EditorImpl {
         Promise::ok(())
     }
 
+    fn get(&mut self,
+           params: editor::GetParams,
+           mut results: editor::GetResults)
+           -> Promise<(), ::capnp::Error> {
+        let start_line = pry!(params.get()).get_start_line() as usize;
+        let end_line = pry!(params.get()).get_end_line() as usize;
+
+        let mut lines = String::new();
+        let mut i = 0;
+        for line in self.content.lines_raw() {
+            if i < start_line {
+                i += 1;
+                continue;
+            } else if i >= end_line {
+                break;
+            }
+
+            lines.push_str(&line);
+            i += 1;
+        }
+        results.get().set_lines(&lines);
+        Promise::ok(())
+    }
+
     fn insert(&mut self,
               params: editor::InsertParams,
               _results: editor::InsertResults)

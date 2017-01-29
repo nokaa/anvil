@@ -42,6 +42,16 @@ fn main() {
                 .help("The filename to write editor contents to.")
                 .required(true)
                 .index(1)))
+        .subcommand(SubCommand::with_name("get")
+            .about("Gets the lines in the range [start, end)")
+            .arg(Arg::with_name("START")
+                .help("The starting line index")
+                .required(true)
+                .index(1))
+            .arg(Arg::with_name("END")
+                .help("The ending line index")
+                .required(true)
+                .index(2)))
         .subcommand(SubCommand::with_name("insert")
             .about("Insert <TEXT> at [LINE][COLUMN]")
             .arg(Arg::with_name("LINE")
@@ -101,6 +111,14 @@ fn main() {
         let file_name = matches.value_of("FILENAME").unwrap();
         let cmd = commands::Command::new(path).unwrap();
         cmd.write_file(file_name).unwrap();
+    } else if let Some(matches) = matches.subcommand_matches("get") {
+        let start = matches.value_of("START").unwrap();
+        let end = matches.value_of("END").unwrap();
+        let start = u64::from_str_radix(start, 10).unwrap();
+        let end = u64::from_str_radix(end, 10).unwrap();
+
+        let cmd = commands::Command::new(path).unwrap();
+        cmd.get(start, end).unwrap();
     } else if let Some(matches) = matches.subcommand_matches("insert") {
         let text = matches.value_of("TEXT").unwrap();
         let line = matches.value_of("LINE").unwrap();
