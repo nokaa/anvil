@@ -7,19 +7,19 @@ use futures::{Future, Stream};
 use tokio_core::io::Io;
 use tokio_core::reactor::Core;
 use tokio_uds::UnixListener;
-// use xi_rope::Rope;
+use xi_rope::Rope;
 
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::Path;
 
 struct EditorImpl {
-    content: Vec<String>,
+    content: Rope,
 }
 
 impl EditorImpl {
     pub fn new() -> EditorImpl {
-        EditorImpl { content: vec![String::new()] }
+        EditorImpl { content: Rope::from("") }
     }
 }
 
@@ -38,13 +38,9 @@ impl editor::Server for EditorImpl {
 
         let mut buf = String::new();
         file.read_to_string(&mut buf).unwrap();
+        let content = Rope::from(buf);
 
-        let mut contents = Vec::new();
-        for line in buf.lines() {
-            contents.push(line.to_string());
-        }
-
-        self.content = contents;
+        self.content = content;
 
         Promise::ok(())
     }
@@ -56,9 +52,7 @@ impl editor::Server for EditorImpl {
         let file_name = pry!(pry!(params.get()).get_path());
         let mut file = File::create(file_name).unwrap();
 
-        for line in &self.content {
-            file.write_all(line.as_bytes()).unwrap();
-        }
+        file.write_all(String::from(self.content.clone()).as_bytes()).unwrap();
 
         Promise::ok(())
     }
@@ -67,24 +61,16 @@ impl editor::Server for EditorImpl {
               params: editor::InsertParams,
               _results: editor::InsertResults)
               -> Promise<(), ::capnp::Error> {
-        let mut line_number = pry!(params.get()).get_line() as usize;
+        let line = pry!(params.get()).get_line() as usize;
         let column = pry!(params.get()).get_column() as usize;
         let text = pry!(pry!(params.get()).get_string());
 
         {
-            let mut line = &mut self.content[line_number];
-            for (i, c) in text.char_indices() {
-                match c {
-                    '\n' => {
-                        // TODO: handle new lines in input
-                    }
-                    _ => {
-                        line.insert(column + i, c);
-                    }
-                }
-            }
+            let index = self.content.offset_of_line(line) + column;
+            self.content.edit_str(index, index, text)
         }
-        println!("{:?}", self.content);
+
+        println!("{}", String::from(self.content.clone()));
         Promise::ok(())
     }
 
@@ -92,19 +78,16 @@ impl editor::Server for EditorImpl {
               params: editor::DeleteParams,
               _results: editor::DeleteResults)
               -> Promise<(), ::capnp::Error> {
-        let line = pry!(params.get()).get_line();
+        let line = pry!(params.get()).get_line() as usize;
         let column = pry!(params.get()).get_column() as usize;
         let length = pry!(params.get()).get_length() as usize;
 
         {
-            let mut line = &mut self.content[line as usize];
-            // TODO: handle cases where column + length > line.len().
-            // We want to move onto the next line and continue removing elements.
-            for i in 0..length {
-                line.remove(column + i);
-            }
+            let index = self.content.offset_of_line(line) + column;
+            self.content.edit_str(index, index + length, "");
         }
-        println!("{:?}", self.content);
+
+        println!("{}", String::from(self.content.clone()));
         Promise::ok(())
     }
 
