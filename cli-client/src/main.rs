@@ -4,6 +4,7 @@ extern crate anvil_rpc;
 extern crate capnp;
 #[macro_use]
 extern crate capnp_rpc;
+#[macro_use]
 extern crate clap;
 #[macro_use]
 extern crate error_chain;
@@ -20,9 +21,9 @@ use clap::{Arg, App, SubCommand};
 use std::u64;
 
 fn main() {
-    let matches = App::new("anvil-cli-client")
-        .version("0.1")
-        .author("nokaa <nokaa@cock.li>")
+    let matches = App::new(crate_name!())
+        .version(crate_version!())
+        .author(crate_authors!())
         .about("A CLI client for making RPC calls on an Anvil server")
         .arg(Arg::with_name("path")
             .short("p")
@@ -114,41 +115,31 @@ fn main() {
         let cmd = commands::Command::new(path).unwrap();
         cmd.write_file(file_name).unwrap();
     } else if let Some(matches) = matches.subcommand_matches("get") {
-        let start = matches.value_of("START").unwrap();
-        let end = matches.value_of("END").unwrap();
-        let start = u64::from_str_radix(start, 10).unwrap();
-        let end = u64::from_str_radix(end, 10).unwrap();
+        let start = value_t!(matches, "START", u64).unwrap();
+        let end = value_t!(matches, "END", u64).unwrap();
 
         let cmd = commands::Command::new(path).unwrap();
         let lines = cmd.get(start, end).unwrap();
         println!("{}", lines);
     } else if let Some(matches) = matches.subcommand_matches("insert") {
         let text = matches.value_of("TEXT").unwrap();
-        let line = matches.value_of("LINE").unwrap();
-        let column = matches.value_of("COLUMN").unwrap();
-        let line = u64::from_str_radix(line, 10).unwrap();
-        let column = u64::from_str_radix(column, 10).unwrap();
+        let line = value_t!(matches, "LINE", u64).unwrap();
+        let column = value_t!(matches, "COLUMN", u64).unwrap();
 
         let cmd = commands::Command::new(path).unwrap();
         cmd.insert(line, column, text).unwrap();
     } else if let Some(matches) = matches.subcommand_matches("delete") {
-        let line = matches.value_of("LINE").unwrap();
-        let column = matches.value_of("COLUMN").unwrap();
-        let length = matches.value_of("LENGTH").unwrap();
-        let line = u64::from_str_radix(line, 10).unwrap();
-        let column = u64::from_str_radix(column, 10).unwrap();
-        let length = u64::from_str_radix(length, 10).unwrap();
+        let line = value_t!(matches, "LINE", u64).unwrap();
+        let column = value_t!(matches, "COLUMN", u64).unwrap();
+        let length = value_t!(matches, "LENGTH", u64).unwrap();
 
         let cmd = commands::Command::new(path).unwrap();
         cmd.delete(line, column, length).unwrap();
     } else if let Some(matches) = matches.subcommand_matches("replace") {
         let character = matches.value_of("CHARACTER").unwrap();
-        let line = matches.value_of("LINE").unwrap();
-        let column = matches.value_of("COLUMN").unwrap();
-        let length = matches.value_of("LENGTH").unwrap();
-        let line = u64::from_str_radix(line, 10).unwrap();
-        let column = u64::from_str_radix(column, 10).unwrap();
-        let length = u64::from_str_radix(length, 10).unwrap();
+        let line = value_t!(matches, "LINE", u64).unwrap();
+        let column = value_t!(matches, "COLUMN", u64).unwrap();
+        let length = value_t!(matches, "LENGTH", u64).unwrap();
 
         if character.len() > 1 {
             panic!("CHARACTER must be a char, given {}", character);
