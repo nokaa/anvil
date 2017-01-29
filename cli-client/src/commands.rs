@@ -60,7 +60,7 @@ impl Command {
         Ok(())
     }
 
-    pub fn get(mut self, start: u64, end: u64) -> Result<()> {
+    pub fn get(mut self, start: u64, end: u64) -> Result<String> {
         let mut request = self.editor.get_request();
         request.get().set_start_line(start);
         request.get().set_end_line(end);
@@ -69,8 +69,7 @@ impl Command {
             .run(request.send().promise)
             .chain_err(|| "unable to run event loop")?;
         let lines = response.get()?.get_lines()?;
-        println!("{}", lines);
-        Ok(())
+        Ok(lines.to_string())
     }
 
     pub fn insert(mut self, line: u64, column: u64, text: &str) -> Result<()> {

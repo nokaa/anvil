@@ -13,6 +13,7 @@ extern crate tokio_uds;
 
 mod commands;
 mod error;
+mod repl;
 
 use clap::{Arg, App, SubCommand};
 
@@ -30,6 +31,7 @@ fn main() {
             .help("Sets path of the UDS used by the server")
             .takes_value(true)
             .required(false))
+        .subcommand(SubCommand::with_name("repl").about("Runs a repl to easily run many commands"))
         .subcommand(SubCommand::with_name("openFile")
             .about("Opens FILENAME and sets the editors contents to the file's contents")
             .arg(Arg::with_name("FILENAME")
@@ -118,7 +120,8 @@ fn main() {
         let end = u64::from_str_radix(end, 10).unwrap();
 
         let cmd = commands::Command::new(path).unwrap();
-        cmd.get(start, end).unwrap();
+        let lines = cmd.get(start, end).unwrap();
+        println!("{}", lines);
     } else if let Some(matches) = matches.subcommand_matches("insert") {
         let text = matches.value_of("TEXT").unwrap();
         let line = matches.value_of("LINE").unwrap();
@@ -158,5 +161,7 @@ fn main() {
     } else if let Some(_matches) = matches.subcommand_matches("quit") {
         let cmd = commands::Command::new(path).unwrap();
         cmd.quit().unwrap();
+    } else if let Some(_matches) = matches.subcommand_matches("repl") {
+        repl::run(path).unwrap();
     }
 }
